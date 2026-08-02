@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Amrani Parapharmacie</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+
+    <!-- Font Awesome (icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <style>
+        /* ---------- RESET & BASE ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #ffffff;
+            color: #1e293b;
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        img {
+            max-width: 100%;
+            display: block;
+        }
+
+        .container {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* ---------- COLORS ---------- */
+        :root {
+            --primary: #16a34a;
+            --primary-dark: #15803d;
+            --primary-light: #dcfce7;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-500: #64748b;
+            --gray-700: #334155;
+            --gray-900: #0f172a;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.10);
+            --radius: 1.25rem;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ---------- BUTTONS ---------- */
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            padding: 0.75rem 2rem;
+            border-radius: 9999px;
+            font-weight: 500;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 10px 25px -5px rgba(22, 163, 74, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            padding: 0.75rem 2rem;
+            border-radius: 9999px;
+            font-weight: 500;
+            border: 2px solid var(--primary);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* ---------- NAVBAR ---------- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+            transition: var(--transition);
+            height: 72px;
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .navbar .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 1.3rem;
+            color: var(--gray-900);
+        }
+
+        .logo i {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        .logo span {
+            font-weight: 300;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a.active {
+            color: var(--primary);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .lang-toggle {
+            background: var(--gray-100);
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .lang-toggle:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+
+        .hamburger span {
+            width: 26px;
+            height: 2.5px;
+            background: var(--gray-900);
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        /* ---------- HERO ---------- */
+        .hero {
+            padding-top: 72px;
+            min-height: 92vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 60%, #ecfdf5 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('https://images.unsplash.com/photo-1585435557343-3b092031a831?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+            opacity: 0.08;
+            z-index: 0;
+        }
+
+        .hero .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content {
+            max-width: 600px;
+        }
+
+        .hero-content .logo-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-content .logo-badge i {
+            font-size: 3rem;
+            color: var(--primary);
+        }
+
+        .hero-content .logo-badge h1 {
+            font-size: 2.8rem;
+            font-weight: 300;
+            color: var(--gray-900);
+        }
+
+        .hero-content .logo-badge h1 span {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            color: var(--gray-500);
+            max-width: 460px;
+            margin: 1rem 0 2rem;
+            line-height: 1.8;
+        }
+
+        .hero-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        /* ---------- SECTION TITLES ---------- */
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.2rem;
+            font-weight: 300;
+            color: var(--gray-900);
+        }
+
+        .section-title p {
+            color: var(--gray-500);
+            margin-top: 0.25rem;
+        }
+
+        /* ---------- ABOUT ---------- */
+        .about {
+            padding: 5rem 0;
+            background: #fff;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .about-card {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            background: var(--gray-50);
+            border-radius: var(--radius);
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .about-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .about-card i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .about-card h4 {
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
+        }
+
+        .about-card p {
+            font-size: 0.9rem;
+            color: var(--gray-500);
+        }
+
+        /* ---------- CATEGORIES ---------- */
+        .categories {
+            padding: 5rem 0;
+            background: var(--gray-50);
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .category-card {
+            background: #fff;
+            padding: 1.5rem 1rem;
+            border-radius: var(--radius);
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: default;
+        }
+
+        .category-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .category-card i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .category-card span {
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: var(--gray-700);
+        }
+
+        /* ---------- PRODUCTS ---------- */
+        .products {
+            padding: 5rem 0;
+            background: #fff;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .product-card {
+            background: #fff;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid var(--gray-100);
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .product-card .img-wrap {
+            aspect-ratio: 1/1;
+            background: var(--gray-50);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-card .img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .product-card:hover .img-wrap img {
+            transform: scale(1.05);
+        }
+
+        .product-card .badge {
+            position: absolute;
+            top: 0.75rem;
+            left: 0.75rem;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+        }
+
+        .product-card .body {
+            padding: 1rem;
+        }
+
+        .product-card .body .brand {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gray-500);
+            font-weight: 600;
+        }
+
+        .product-card .body h4 {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin: 0.25rem 0;
+            color: var(--gray-900);
+        }
+
+        .product-card .body .desc {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-card .body .price-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 0.75rem;
+        }
+
+        .product-card .body .price {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--gray-900);
+        }
+
+        .product-card .body .whatsapp-btn {
+            background: #25d366;
+            color: #fff;
+            border: none;
+            border-radius: 9999px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .product-card .body .whatsapp-btn:hover {
+            background: #128c7e;
+            transform: scale(1.05);
+        }
+
+        /* ---------- PROMOTIONS ---------- */
+        .promotions {
+            padding: 4rem 0;
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .promotions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2rem;
+        }
+
+        .promo-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(4px);
+            padding: 2rem 1.5rem;
+            border-radius: var(--radius);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: var(--transition);
+        }
+
+        .promo-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-4px);
+        }
+
+        .promo-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .promo-card h4 {
+            font-size: 1.2rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .promo-card p {
+            opacity: 0.85;
+            font-size: 0.95rem;
+        }
+
+        /* ---------- BRANDS ---------- */
+        .brands {
+            padding: 4rem 0;
+            background: var(--gray-50);
+        }
+
+        .brands-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .brand-card {
+            background: #fff;
+            padding: 1.5rem 1rem;
+            border-radius: var(--radius);
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            font-weight: 500;
+            color: var(--gray-500);
+            border: 1px solid var(--gray-100);
+        }
+
+        .brand-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+            color: var(--primary);
+            border-color: var(--primary-light);
+        }
+
+        /* ---------- TESTIMONIALS ---------- */
+        .testimonials {
+            padding: 5rem 0;
+            background: #fff;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2rem;
+        }
+
+        .testimonial-card {
+            background: var(--gray-50);
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .testimonial-card .stars {
+            color: #f59e0b;
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+        }
+
+        .testimonial-card p {
+            font-style: italic;
+            color: var(--gray-700);
+        }
+
+        .testimonial-card .author {
+            margin-top: 1rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        /* ---------- INSTAGRAM ---------- */
+        .instagram {
+            padding: 4rem 0;
+            background: var(--gray-50);
+        }
+
+        .insta-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.5rem;
+        }
+
+        .insta-grid .insta-item {
+            aspect-ratio: 1/1;
+            background: var(--gray-200);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .insta-grid .insta-item:hover {
+            transform: scale(1.03);
+        }
+
+        .insta-grid .insta-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ---------- CONTACT ---------- */
+        .contact {
+            padding: 5rem 0;
+            background: #fff;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .contact-info .info-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--gray-700);
+        }
+
+        .contact-info .info-item i {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .contact-form {
+            background: var(--gray-50);
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 0.75rem;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: #fff;
+        }
+
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+        }
+
+        .contact-form textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .contact-form .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .contact-form button {
+            width: 100%;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+
+        .map-placeholder {
+            margin-top: 3rem;
+            border-radius: var(--radius);
+            overflow: hidden;
+            height: 260px;
+            background: var(--gray-200);
+            box-shadow: var(--shadow);
+        }
+
+        .map-placeholder iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        /* ---------- FOOTER ---------- */
+        .footer {
+            background: var(--gray-900);
+            color: #e2e8f0;
+            padding: 3rem 0 1.5rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer .logo {
+            color: #fff;
+        }
+
+        .footer p {
+            font-size: 0.9rem;
+            opacity: 0.75;
+            max-width: 280px;
+        }
+
+        .footer h4 {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .footer ul {
+            list-style: none;
+        }
+
+        .footer ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer ul a {
+            opacity: 0.75;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .footer ul a:hover {
+            opacity: 1;
+            color: var(--primary);
+        }
+
+        .footer .socials {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .footer .socials a {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            color: #fff;
+        }
+
+        .footer .socials a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 1.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+
+        /* ---------- BACK TO TOP ---------- */
+        .back-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary);
+            color: #fff;
+            width: 48px;
+            height: 48px;
+            border-radius: 9999px;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 20px rgba(22, 163, 74, 0.35);
+            transition: var(--transition);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            z-index: 999;
+        }
+
+        .back-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .back-top:hover {
+            background: var(--primary-dark);
+            transform: translateY(-4px) scale(1.05);
+        }
+
+        /* ---------- SCROLL ANIMATIONS ---------- */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 1024px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .insta-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 72px;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(12px);
+                flex-direction: column;
+                padding: 2rem 1.5rem;
+                gap: 1.5rem;
+                border-bottom: 1px solid var(--gray-200);
+                transform: translateY(-120%);
+                transition: var(--transition);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+            }
+
+            .nav-links.open {
+                transform: translateY(0);
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .hero-content .logo-badge h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero-content p {
+                font-size: 1rem;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            }
+
+            .categories-grid {
+                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .contact-form .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .insta-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .about-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-content .logo-badge h1 {
+                font-size: 1.8rem;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .brands-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== NAVBAR ========== -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-droplet"></i> Amrani <span>Parapharmacie</span>
+            </a>
+
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html" class="active">Accueil</a></li>
+                <li><a href="#products">Produits</a></li>
+                <li><a href="#about">À propos</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button class="lang-toggle" id="langToggle"><i class="fas fa-globe"></i> FR</button>
+                <button class="hamburger" id="hamburger" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ========== HERO ========== -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <div class="logo-badge">
+                    <i class="fas fa-droplet"></i>
+                    <h1>Amrani <span>Parapharmacie</span></h1>
+                </div>
+                <p>Votre bien-être, notre engagement. Des produits de parapharmacie de haute qualité, sélectionnés avec soin pour vous et votre famille.</p>
+                <div class="hero-buttons">
+                    <a href="#products" class="btn-primary"><i class="fas fa-shopping-bag"></i> Découvrir nos produits</a>
+                    <a href="#about" class="btn-outline">En savoir plus</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== ABOUT ========== -->
+    <section class="about" id="about">
+        <div class="container">
+            <div class="section-title fade-up">
+                <h2>À propos</h2>
+                <p>Une parapharmacie dédiée à votre santé</p>
+            </div>
+            <div class="about-grid">
+                <div class="about-card fade-up">
+                    <i class="fas fa-shield-alt"></i>
+                    <h4>Qualité certifiée</h4>
+                    <p>Des produits rigoureusement sélectionnés</p>
+                </div>
+                <div class="about-card fade-up">
+                    <i class="fas fa-user-md"></i>
+                    <h4>Conseil professionnel</h4>
+                    <p>Une équipe à votre écoute</p>
+                </div>
+                <div class="about-card fade-up">
+                    <i class="fas fa-handshake"></i>
+                    <h4>Marques de confiance</h4>
+                    <p>Les meilleures marques partenaires</p>
+                </div>
+                <div class="about-card fade-up">
+                    <i class="fas fa-heart"></i>
+                    <h4>Bien-être garanti</h4>
+                    <p>Votre satisfaction est notre priorité</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== CATEGORIES ========== -->
+    <section class="categories" id="categories">
+        <div class="container">
+            <div class="section-title fade-up">
+                <h2>Nos catégories</h2>
+                <p>Retrouvez tous nos produits par univers</p>
+            </div>
+            <div class="categories-grid">
+                <div class="category-card fade-up"><i class="fas fa-sparkles"></i><span>Soins du visage</span></div>
+                <div class="category-card fade-up"><i class="fas fa-droplet"></i><span>Soins du corps</span></div>
+                <div class="category-card fade-up"><i class="fas fa-cut"></i><span>Cheveux</span></div>
+                <div class="category-card fade-up"><i class="fas fa-baby"></i><span>Bébé</span></div>
+                <div class="category-card fade-up"><i class="fas fa-hand-sparkles"></i><span>Hygiène</span></div>
+                <div class="category-card fade-up"><i class="fas fa-pills"></i><span>Compléments</span></div>
+                <div class="category-card fade-up"><i class="fas fa-stethoscope"></i><span>Matériel médical</span></div>
+                <div class="category-card fade-up"><i class="fas fa-heart"></i><span>Bien-être</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== PRODUCTS ========== -->
+    <section class="products" id="products">
+        <div class="container">
+            <div class="section-title fade-up">
+                <h2>Produits vedettes</h2>
+                <p>Les favoris de nos clients</p>
+            </div>
+            <div class="products-grid" id="productsGrid">
+                <!-- Rempli par JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== PROMOTIONS ========== -->
+    <section class="promotions" id="promotions">
+        <div class="container">
+            <div class="section-title fade-up" style="color:#fff;">
+                <h2 style="color:#fff;">Offres spéciales</h2>
+                <p style="color:rgba(255,255,255,0.8);">Profitez de réductions exclusives</p>
+            </div>
+            <div class="promotions-grid">
+                <div class="promo-card fade-up">
+                    <i class="fas fa-tags"></i>
+                    <h4>-20% sur les soins visage</h4>
+                    <p>Jusqu'au 31 août</p>
+                </div>
+                <div class="promo-card fade-up">
+                    <i class="fas fa-gift"></i>
+                    <h4>Offre découverte</h4>
+                    <p>3 produits achetés = 1 offert</p>
+                </div>
+                <div class="promo-card fade-up">
+                    <i class="fas fa-shipping-fast"></i>
+                    <h4>Livraison gratuite</h4>
+                    <p>Dès 350 DH d'achat</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== BRANDS ========== -->
+    <section class="brands" id="brands">
+        <div class="container">
+            <div class="section-title fade-up">
+                <h2>Marques partenaires</h2>
+                <p>Les marques qui nous font confiance</p>
+            </div>
+            <div class="brands-grid">
+                <div class="brand-card fade-up">Vichy</div>
+                <div class="brand-card fade-up">La Roche-Posay</div>
+                <div class="brand-card fade-up">Avene</div>
+                <div class="brand-card fade-up">Bioderma</div>
+                <div class="brand-card fade-up">Nuxe</div>
+                <div class="brand-card fade-up">Caudalie</div>
+                <div class="brand-card fade-up">Omron</div>
+                <div class="brand-card fade-up">Philips</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== TESTIMONIALS ========== -->
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="section-title fade-up">
+                <h2>Ce que nos clients disent</h2>
+                <p>Ils nous font confiance</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card fade-up">
+                    <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p>"Une équipe exceptionnelle, des produits de qualité. Je recommande vivement !"</p>
+                    <div class="author">Sophie M.</div>
+                </div>
+                <div class="testimonial-card fade-up">
+                    <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p>"Livraison rapide et soignée. Le conseil personnalisé fait toute la différence."</p>
+                    <div class="author">Karim A.</div>
+                </div>
+                <div class="testimonial-card fade-up">
+                    <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                    <p>"Ma parapharmacie de référence. Des produits introuvables ailleurs."</p>
+                    <div class="author">Leila R.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== INSTAGRAM ========== -->
+    <section class="instagram" id="instagram">
+        <div class="container">
+            <div class="section-title fade-up">
+                <h2>Suivez-nous sur Instagram</h2>
+                <p>@amrani_parapharmacie</p>
+            </div>
+            <div class="insta-grid">
+                <div class="insta-item fade-up"><img src="https://images.unsplash.com/photo-1556228578-8c89e6adf883?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="insta" /></div>
+                <div class="insta-item fade-up"><img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="insta" /></div>
+                <div class="insta-item fade-up"><img src="https://images.unsplash.com/photo-1556228578-8c89e6adf883?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="insta" /></div>
+                <div class="insta-item fade-up"><img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="insta" /></div>
+                <div class="insta-item fade-up"><img src="https://images.unsplash.com/photo-1556228578-8c89e6adf883?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="insta" /></div>
+                <div class="insta-item fade-up"><img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="insta" /></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== CONTACT ========== -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="section-title fade-up">
+                <h2>Contactez-nous</h2>
+                <p>Nous sommes à votre écoute</p>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-info fade-up">
+                    <div class="info-item"><i class="fas fa-phone"></i> +212 5 22 123 456</div>
+                    <div class="info-item"><i class="fab fa-whatsapp" style="color:#25d366;"></i> +212 6 12 345 678</div>
+                    <div class="info-item"><i class="fab fa-instagram"></i> @amrani_parapharmacie</div>
+                    <div class="info-item"><i class="fas fa-envelope"></i> contact@amrani-parapharmacie.ma</div>
+                    <div class="info-item"><i class="fas fa-map-marker-alt"></i> 123, Avenue Mohammed V, Casablanca</div>
+                    <div class="info-item"><i class="fas fa-clock"></i> Lun–Ven 9h–20h · Sam 9h–18h</div>
+                </div>
+
+                <div class="contact-form fade-up">
+                    <h4 style="margin-bottom:1.5rem; font-weight:600;">Envoyez-nous un message</h4>
+                    <form id="contactForm">
+                        <div class="form-row">
+                            <input type="text" placeholder="Votre nom" required />
+                            <input type="email" placeholder="Votre email" required />
+                        </div>
+                        <input type="text" placeholder="Objet" style="margin-bottom:1rem;" />
+                        <textarea placeholder="Votre message..." required></textarea>
+                        <button type="button" class="btn-primary"><i class="fas fa-paper-plane"></i> Envoyer</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="map-placeholder fade-up">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13293.277567654442!2d-7.589843!3d33.573110!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xda7cd4778aa113b%3A0xb06c1d84f310fd3!2sCasablanca%2C%20Maroc!5e0!3m2!1sfr!2sma!4v1710000000000" allowfullscreen loading="lazy"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <a href="index.html" class="logo"><i class="fas fa-droplet"></i> Amrani <span>Parapharmacie</span></a>
+                    <p style="margin-top:1rem;">Votre parapharmacie de confiance au Maroc. Qualité, conseil et produits premium pour votre bien-être.</p>
+                    <div class="socials">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h4>Liens rapides</h4>
+                    <ul>
+                        <li><a href="index.html">Accueil</a></li>
+                        <li><a href="#products">Produits</a></li>
+                        <li><a href="#about">À propos</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Informations</h4>
+                    <ul>
+                        <li><a href="#">Livraison</a></li>
+                        <li><a href="#">Politique de confidentialité</a></li>
+                        <li><a href="#">CGV</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><i class="fas fa-phone" style="width:1.2rem;"></i> +212 5 22 123 456</li>
+                        <li><i class="fas fa-envelope" style="width:1.2rem;"></i> contact@amrani.ma</li>
+                        <li><i class="fas fa-map-marker-alt" style="width:1.2rem;"></i> Casablanca</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2026 Amrani Parapharmacie. Tous droits réservés.
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========== BACK TO TOP ========== -->
+    <button class="back-top" id="backTop" aria-label="Retour en haut"><i class="fas fa-arrow-up"></i></button>
+
+    <!-- ========== JAVASCRIPT ========== -->
+    <script>
+        (function() {
+            'use strict';
+
+            // ---- PRODUCT DATA ----
+            const products = [
+                { id: 1, name: 'Crème Hydratante Visage', brand: 'Vichy', price: 89,
+                    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+                    desc: 'Hydratation intense 24h.' },
+                { id: 2, name: 'Sérum Anti-Âge', brand: 'La Roche-Posay', price: 120,
+                    image: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+                    desc: 'Rides et fermeté.' },
+                { id: 3, name: 'Lait Corporel Nourrissant', brand: 'Avene', price: 75,
+                    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+                    desc: 'Apaisant et réparateur.' },
+                { id: 4, name: 'Shampoing Douceur', brand: 'Bioderma', price: 65,
+                    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+                    desc: 'Doux pour le cuir chevelu.' },
+                { id: 5, name: 'Gel Nettoyant Visage', brand: 'Nuxe', price: 55,
+                    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+                    desc: 'Purifiant et frais.' },
+                { id: 6, name: 'Huile Corporelle', brand: 'Caudalie', price: 95,
+                    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+                    desc: 'Nutrition et éclat.' },
+                { id: 7, name: 'Lait Bébé', brand: 'Vichy', price: 70,
+                    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+                    desc: 'Doux pour bébé.' },
+                { id: 8, name: 'Déodorant 48h', brand: 'La Roche-Posay', price: 45,
+                    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+                    desc: 'Protection longue durée.' },
+                { id: 9, name: 'Vitamine C', brand: 'Bioderma', price: 150,
+                    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+                    desc: 'Boost immunitaire.' },
+                { id: 10, name: 'Tensiomètre', brand: 'Omron', price: 320,
+                    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+                    desc: 'Précision médicale.' },
+                { id: 11, name: 'Crème Mains Réparatrice', brand: 'Avene', price: 40,
+                    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+                    desc: 'Mains douces.' },
+                { id: 12, name: 'Sérum Cheveux', brand: 'Nuxe', price: 85,
+                    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+                    desc: 'Brillance et force.' },
+            ];
+
+            // ---- RENDER PRODUCTS ----
+            const grid = document.getElementById('productsGrid');
+            if (grid) {
+                products.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card fade-up';
+                    card.innerHTML = `
+                        <div class="img-wrap">
+                            <img src="${p.image}" alt="${p.name}" loading="lazy" />
+                            <span class="badge">Disponible</span>
+                        </div>
+                        <div class="body">
+                            <div class="brand">${p.brand}</div>
+                            <h4>${p.name}</h4>
+                            <div class="desc">${p.desc}</div>
+                            <div class="price-row">
+                                <span class="price">${p.price} DH</span>
+                                <button class="whatsapp-btn" onclick="window.open('https://wa.me/212612345678?text=Bonjour%2C%20je%20suis%20int%C3%A9ress%C3%A9%20par%20${encodeURIComponent(p.name)}','_blank')">
+                                    <i class="fab fa-whatsapp"></i> WhatsApp
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+
+            // ---- MOBILE NAV ----
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('navLinks');
+
+            if (hamburger && navLinks) {
+                hamburger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    navLinks.classList.toggle('open');
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) {
+                        navLinks.classList.remove('open');
+                    }
+                });
+            }
+
+            // ---- STICKY NAVBAR ----
+            const navbar = document.getElementById('navbar');
+            let lastScroll = 0;
+
+            window.addEventListener('scroll', function() {
+                const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+                if (currentScroll > 20) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+                lastScroll = currentScroll;
+
+                // Back to top visibility
+                const backTop = document.getElementById('backTop');
+                if (backTop) {
+                    if (currentScroll > 400) {
+                        backTop.classList.add('visible');
+                    } else {
+                        backTop.classList.remove('visible');
+                    }
+                }
+            });
+
+            // ---- BACK TO TOP ----
+            const backTop = document.getElementById('backTop');
+            if (backTop) {
+                backTop.addEventListener('click', function() {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
+
+            // ---- SCROLL ANIMATIONS (Intersection Observer) ----
+            const fadeElements = document.querySelectorAll('.fade-up');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -40px 0px'
+            });
+
+            fadeElements.forEach(el => observer.observe(el));
+
+            // ---- LANGUAGE TOGGLE (visual only) ----
+            const langToggle = document.getElementById('langToggle');
+            if (langToggle) {
+                let isFR = true;
+                langToggle.addEventListener('click', function() {
+                    isFR = !isFR;
+                    this.innerHTML = isFR ? '<i class="fas fa-globe"></i> FR' :
+                        '<i class="fas fa-globe"></i> AR';
+                    // For demo, just toggle text on hero and section titles
+                    const heroTitle = document.querySelector('.hero-content .logo-badge h1');
+                    const heroP = document.querySelector('.hero-content p');
+                    if (heroTitle && heroP) {
+                        if (!isFR) {
+                            heroTitle.innerHTML = 'Amrani <span>Parapharmacie</span>';
+                            heroP.textContent = 'Votre bien-être, notre engagement. Des produits de parapharmacie de haute qualité, sélectionnés avec soin pour vous et votre famille.';
+                        } else {
+                            heroTitle.innerHTML = 'Amrani <span>Parapharmacie</span>';
+                            heroP.textContent = 'Votre bien-être, notre engagement. Des produits de parapharmacie de haute qualité, sélectionnés avec soin pour vous et votre famille.';
+                        }
+                    }
+                    // simple alert for demo
+                    // just visual toggle
+                });
+            }
+
+            // ---- CONTACT FORM (frontend only) ----
+            const contactForm = document.getElementById('contactForm');
+            if (contactForm) {
+                contactForm.querySelector('button').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    alert('Merci ! Votre message a été envoyé. (Démo frontend)');
+                    contactForm.reset();
+                });
+            }
+
+            // ---- SMOOTH SCROLL FOR ANCHOR LINKS ----
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    const target = document.querySelector(targetId);
+                    if (target) {
+                        e.preventDefault();
+                        const offset = 72 + 20;
+                        const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+                        window.scrollTo({ top, behavior: 'smooth' });
+                        // close mobile nav
+                        if (navLinks) navLinks.classList.remove('open');
+                    }
+                });
+            });
+
+        })();
+    </script>
+
+</body>
+</html>
