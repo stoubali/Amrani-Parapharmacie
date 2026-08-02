@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Amrani Parapharmacie - Messages</title>
+    
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/admin.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+    <link rel="stylesheet" href="css/messages.css" />
+</head>
+<body>
+
+    <!-- ==================== SIDEBAR ==================== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">
+                <i class="fas fa-plus-circle"></i>
+            </div>
+            <span class="brand-name">Amrani</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-link">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="products.html" class="nav-link">
+                <i class="fas fa-capsules"></i>
+                <span>Products</span>
+            </a>
+            <a href="categories.html" class="nav-link">
+                <i class="fas fa-tags"></i>
+                <span>Categories</span>
+            </a>
+            <a href="promotions.html" class="nav-link">
+                <i class="fas fa-bullhorn"></i>
+                <span>Promotions</span>
+            </a>
+            <a href="messages.html" class="nav-link active">
+                <i class="fas fa-envelope"></i>
+                <span>Messages</span>
+                <span class="badge" id="unreadBadge">0</span>
+            </a>
+            <a href="settings.html" class="nav-link">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">A</div>
+                <div>
+                    <div class="user-name">Admin</div>
+                    <div class="user-role">Pharmacist</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <div class="main-wrapper">
+        <!-- Top Navbar -->
+        <header class="top-navbar">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div class="navbar-search">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search messages..." id="searchInput" />
+            </div>
+
+            <div class="navbar-actions">
+                <button class="icon-btn" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge" id="notificationBadge">0</span>
+                </button>
+                <button class="icon-btn" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="page-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div>
+                    <h1>Messages</h1>
+                    <p class="breadcrumb">Home / Messages</p>
+                </div>
+                <div class="page-actions">
+                    <button class="btn btn-outline" id="refreshBtn">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                    <button class="btn btn-outline" id="markAllReadBtn">
+                        <i class="fas fa-check-double"></i> Mark All Read
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-bar">
+                <div class="filters-left">
+                    <div class="filter-group">
+                        <label for="statusFilter">Status</label>
+                        <select id="statusFilter">
+                            <option value="all">All Messages</option>
+                            <option value="unread">Unread</option>
+                            <option value="read">Read</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filters-right">
+                    <span class="results-count" id="resultsCount">0 messages</span>
+                    <button class="btn btn-outline" id="clearFiltersBtn">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages Table -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table messages-table">
+                            <thead>
+                                <tr>
+                                    <th>Customer</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Message</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="messagesTableBody">
+                                <!-- Dynamically populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Empty State -->
+                    <div id="emptyState" class="empty-state" style="display: none;">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No Messages Found</h3>
+                        <p>Your inbox is empty. Messages from customers will appear here.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- View Message Modal -->
+    <div class="modal-overlay" id="viewModal">
+        <div class="modal modal-view">
+            <div class="modal-header">
+                <h2>Message Details</h2>
+                <button class="modal-close" id="closeViewModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="view-message" id="viewMessageContent">
+                    <!-- Dynamically populated -->
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" id="viewDeleteBtn">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                    <button type="button" class="btn btn-primary" id="viewToggleReadBtn">
+                        <i class="fas fa-check"></i> Mark as Read
+                    </button>
+                    <button type="button" class="btn btn-outline" id="closeViewBtn">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal modal-delete">
+            <div class="modal-header">
+                <h2>Confirm Delete</h2>
+                <button class="modal-close" id="closeDeleteModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="delete-confirm">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Are you sure you want to permanently delete this message?</p>
+                    <p class="delete-warning">This action cannot be undone.</p>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" id="cancelDeleteBtn">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                        <i class="fas fa-trash"></i> Delete Message
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script src="js/messages.js"></script>
+</body>
+</html>
