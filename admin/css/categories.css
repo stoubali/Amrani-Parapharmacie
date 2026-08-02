@@ -308,6 +308,7 @@
 }
 
 @media (max-width: 480px) {
+
     /* Hide image column on very small screens */
     .categories-table .hide-mobile {
         display: none;
