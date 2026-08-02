@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Amrani Parapharmacie - Dashboard</title>
+    
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/admin.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+
+    <!-- ==================== SIDEBAR ==================== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">
+                <i class="fas fa-plus-circle"></i>
+            </div>
+            <span class="brand-name">Amrani</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-link active">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="products.html" class="nav-link">
+                <i class="fas fa-capsules"></i>
+                <span>Products</span>
+            </a>
+            <a href="categories.html" class="nav-link">
+                <i class="fas fa-tags"></i>
+                <span>Categories</span>
+            </a>
+            <a href="promotions.html" class="nav-link">
+                <i class="fas fa-bullhorn"></i>
+                <span>Promotions</span>
+            </a>
+            <a href="messages.html" class="nav-link">
+                <i class="fas fa-envelope"></i>
+                <span>Messages</span>
+                <span class="badge">3</span>
+            </a>
+            <a href="settings.html" class="nav-link">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">A</div>
+                <div>
+                    <div class="user-name">Admin</div>
+                    <div class="user-role">Pharmacist</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <div class="main-wrapper">
+        <!-- Top Navbar -->
+        <header class="top-navbar">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div class="navbar-search">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search..." id="searchInput" />
+            </div>
+
+            <div class="navbar-actions">
+                <button class="icon-btn" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </button>
+                <button class="icon-btn" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="page-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div>
+                    <h1>Dashboard</h1>
+                    <p class="breadcrumb">Home / Dashboard</p>
+                </div>
+                <div class="page-actions">
+                    <button class="btn btn-outline" id="refreshBtn">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                    <button class="btn btn-primary" id="addProductQuick">
+                        <i class="fas fa-plus"></i> Add Product
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fas fa-capsules"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Total Products</h3>
+                        <p class="stat-number" id="totalProducts">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Categories</h3>
+                        <p class="stat-number" id="totalCategories">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Active Promotions</h3>
+                        <p class="stat-number" id="activePromotions">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Unread Messages</h3>
+                        <p class="stat-number" id="unreadMessages">0</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Two-column layout -->
+            <div class="dashboard-grid">
+                <!-- Recent Products -->
+                <section class="card recent-products">
+                    <div class="card-header">
+                        <h2><i class="fas fa-capsules"></i> Recent Products</h2>
+                        <a href="products.html" class="link">View All →</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Brand</th>
+                                        <th>Price</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentProductsTable">
+                                    <!-- Dynamically populated -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Recent Messages -->
+                <section class="card recent-messages">
+                    <div class="card-header">
+                        <h2><i class="fas fa-envelope"></i> Recent Messages</h2>
+                        <a href="messages.html" class="link">View All →</a>
+                    </div>
+                    <div class="card-body">
+                        <div id="recentMessagesList">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Quick Actions & Activity -->
+            <div class="dashboard-grid">
+                <!-- Quick Actions -->
+                <section class="card quick-actions">
+                    <div class="card-header">
+                        <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="actions-grid">
+                            <button class="action-btn" data-action="product">
+                                <i class="fas fa-plus-circle"></i>
+                                <span>Add Product</span>
+                            </button>
+                            <button class="action-btn" data-action="category">
+                                <i class="fas fa-tag"></i>
+                                <span>Add Category</span>
+                            </button>
+                            <button class="action-btn" data-action="promotion">
+                                <i class="fas fa-bullhorn"></i>
+                                <span>New Promotion</span>
+                            </button>
+                            <button class="action-btn" data-action="message">
+                                <i class="fas fa-envelope"></i>
+                                <span>View Messages</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Recent Activity -->
+                <section class="card activity">
+                    <div class="card-header">
+                        <h2><i class="fas fa-clock"></i> Recent Activity</h2>
+                    </div>
+                    <div class="card-body">
+                        <ul class="activity-list" id="activityList">
+                            <!-- Dynamically populated -->
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

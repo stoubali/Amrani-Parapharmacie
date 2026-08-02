@@ -1,16 +1,17 @@
 {
+    "version": 2,
     "routes": [
         {
             "src": "/",
             "dest": "/index.html"
         },
         {
-            "src": "/landing.html",
-            "dest": "/landing.html"
+            "src": "/admin",
+            "dest": "/admin/index.html"
         },
         {
-            "src": "/admin.html",
-            "dest": "/admin.html"
+            "src": "/admin/",
+            "dest": "/admin/index.html"
         }
     ]
 }
