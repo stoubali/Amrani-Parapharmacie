@@ -1,17 +1,25 @@
 {
     "version": 2,
-    "routes": [
+    "rewrites": [
         {
-            "src": "/",
-            "dest": "/index.html"
+            "source": "/",
+            "destination": "/index.html"
         },
         {
-            "src": "/admin",
-            "dest": "/admin/index.html"
+            "source": "/landing.html",
+            "destination": "/landing.html"
         },
         {
-            "src": "/admin/",
-            "dest": "/admin/index.html"
+            "source": "/admin",
+            "destination": "/admin/index.html"
+        },
+        {
+            "source": "/admin/",
+            "destination": "/admin/index.html"
+        },
+        {
+            "source": "/admin/(.*)",
+            "destination": "/admin/$1"
         }
     ]
 }
