@@ -1,153 +1,29 @@
 /**
  * Amrani Parapharmacie - Products Management Script
- * Handles product CRUD operations with modals and filters
+ * Full CRUD against the Supabase `products` table (joined with `categories`).
  */
 
-// ==================== DATA STORE ====================
-const ProductsData = {
-    categories: [
-        { id: 1, name_fr: 'Médicaments', name_ar: 'أدوية' },
-        { id: 2, name_fr: 'Vitamines', name_ar: 'فيتامينات' },
-        { id: 3, name_fr: 'Cosmétiques', name_ar: 'مستحضرات تجميل' },
-        { id: 4, name_fr: 'Hygiène', name_ar: 'نظافة' },
-        { id: 5, name_fr: 'Nutrition', name_ar: 'تغذية' }
-    ],
-    products: [
-        {
-            id: 1,
-            name_fr: 'Paracétamol 500mg',
-            name_ar: 'باراسيتامول 500 ملغ',
-            description_fr: 'Antalgique et antipyrétique pour le traitement des douleurs et de la fièvre.',
-            description_ar: 'مسكن للألم وخافض للحرارة لعلاج الآلام والحمى.',
-            price: 45.00,
-            image_url: '',
-            brand: 'Doliprane',
-            category_id: 1,
-            is_available: true,
-            is_featured: true,
-            created_at: '2025-01-15T10:30:00'
-        },
-        {
-            id: 2,
-            name_fr: 'Ibuprofène 400mg',
-            name_ar: 'إيبوبروفين 400 ملغ',
-            description_fr: 'Anti-inflammatoire non stéroïdien pour les douleurs et l\'inflammation.',
-            description_ar: 'مضاد التهاب غير ستيرويدي للآلام والالتهابات.',
-            price: 65.00,
-            image_url: '',
-            brand: 'Advil',
-            category_id: 1,
-            is_available: true,
-            is_featured: false,
-            created_at: '2025-01-14T14:20:00'
-        },
-        {
-            id: 3,
-            name_fr: 'Amoxicilline 500mg',
-            name_ar: 'أموكسيسيلين 500 ملغ',
-            description_fr: 'Antibiotique à large spectre pour les infections bactériennes.',
-            description_ar: 'مضاد حيوي واسع الطيف للعدوى البكتيرية.',
-            price: 85.00,
-            image_url: '',
-            brand: 'Clamoxyl',
-            category_id: 1,
-            is_available: true,
-            is_featured: true,
-            created_at: '2025-01-13T09:15:00'
-        },
-        {
-            id: 4,
-            name_fr: 'Vitamine C 1000mg',
-            name_ar: 'فيتامين سي 1000 ملغ',
-            description_fr: 'Complément alimentaire pour renforcer le système immunitaire.',
-            description_ar: 'مكمل غذائي لتقوية جهاز المناعة.',
-            price: 35.00,
-            image_url: '',
-            brand: 'UPSA',
-            category_id: 2,
-            is_available: false,
-            is_featured: false,
-            created_at: '2025-01-12T11:45:00'
-        },
-        {
-            id: 5,
-            name_fr: 'Zinc 15mg',
-            name_ar: 'زنك 15 ملغ',
-            description_fr: 'Complément en zinc pour la santé de la peau et du système immunitaire.',
-            description_ar: 'مكمل زنك لصحة الجلد والجهاز المناعي.',
-            price: 25.00,
-            image_url: '',
-            brand: 'Zincor',
-            category_id: 2,
-            is_available: true,
-            is_featured: false,
-            created_at: '2025-01-11T16:00:00'
-        },
-        {
-            id: 6,
-            name_fr: 'Crème Hydratante Visage',
-            name_ar: 'كريم ترطيب للوجه',
-            description_fr: 'Crème hydratante pour peau sèche, enrichie en acide hyaluronique.',
-            description_ar: 'كريم مرطب للبشرة الجافة، غني بحمض الهيالورونيك.',
-            price: 120.00,
-            image_url: '',
-            brand: 'La Roche-Posay',
-            category_id: 3,
-            is_available: true,
-            is_featured: true,
-            created_at: '2025-01-10T08:30:00'
-        },
-        {
-            id: 7,
-            name_fr: 'Gel Douche Apaisant',
-            name_ar: 'جل استحمام مهدئ',
-            description_fr: 'Gel douche sans savon pour peaux sensibles.',
-            description_ar: 'جل استحمام خالٍ من الصابون للبشرة الحساسة.',
-            price: 55.00,
-            image_url: '',
-            brand: 'Dermatologique',
-            category_id: 4,
-            is_available: true,
-            is_featured: false,
-            created_at: '2025-01-09T13:20:00'
-        },
-        {
-            id: 8,
-            name_fr: 'Oméga-3 1000mg',
-            name_ar: 'أوميغا-3 1000 ملغ',
-            description_fr: 'Complément alimentaire en acides gras essentiels pour le cœur et le cerveau.',
-            description_ar: 'مكمل غذائي بالأحماض الدهنية الأساسية للقلب والدماغ.',
-            price: 95.00,
-            image_url: '',
-            brand: 'Nutripharm',
-            category_id: 5,
-            is_available: false,
-            is_featured: false,
-            created_at: '2025-01-08T10:00:00'
-        }
-    ],
-    _nextId: 9
+// ==================== STATE ====================
+const State = {
+    products: [],
+    categories: []
 };
 
 // ==================== DOM REFERENCES ====================
 const DOM = {
-    // Table
     tableBody: document.getElementById('productsTableBody'),
     resultsCount: document.getElementById('resultsCount'),
     emptyState: document.getElementById('emptyState'),
-    
-    // Filters
+
     searchInput: document.getElementById('searchInput'),
     categoryFilter: document.getElementById('categoryFilter'),
     availabilityFilter: document.getElementById('availabilityFilter'),
     featuredFilter: document.getElementById('featuredFilter'),
     clearFiltersBtn: document.getElementById('clearFiltersBtn'),
-    
-    // Add Button
+
     addProductBtn: document.getElementById('addProductBtn'),
     emptyAddBtn: document.getElementById('emptyAddBtn'),
-    
-    // Modal - Product Form
+
     productModal: document.getElementById('productModal'),
     modalTitle: document.getElementById('modalTitle'),
     productId: document.getElementById('productId'),
@@ -164,13 +40,12 @@ const DOM = {
     productForm: document.getElementById('productForm'),
     cancelModalBtn: document.getElementById('cancelModalBtn'),
     closeModal: document.getElementById('closeModal'),
-    
-    // Modal - View
+    saveProductBtn: document.getElementById('saveProductBtn'),
+
     viewModal: document.getElementById('viewModal'),
     viewProductContent: document.getElementById('viewProductContent'),
     closeViewModal: document.getElementById('closeViewModal'),
-    
-    // Modal - Delete
+
     deleteModal: document.getElementById('deleteModal'),
     deleteProductName: document.getElementById('deleteProductName'),
     confirmDeleteBtn: document.getElementById('confirmDeleteBtn'),
@@ -180,17 +55,12 @@ const DOM = {
 
 // ==================== HELPER FUNCTIONS ====================
 function formatPrice(price) {
-    return price.toFixed(2) + ' DH';
+    return Number(price || 0).toFixed(2) + ' DH';
 }
 
-function getCategoryName(id) {
-    const category = ProductsData.categories.find(c => c.id === parseInt(id));
+function getCategoryName(categoryId) {
+    const category = State.categories.find(c => c.id === categoryId);
     return category ? category.name_fr : 'Non catégorisé';
-}
-
-function getInitials(name) {
-    if (!name) return '?';
-    return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
 }
 
 function getStatusBadge(product) {
@@ -208,119 +78,112 @@ function getFeaturedBadge(product) {
 }
 
 function showNotification(message, type = 'info') {
-    // Reuse the notification system from dashboard
     if (window.showNotification) {
-        window.showNotification(message, type);
+        window.showNotification(type === 'error' ? '⚠️' : type === 'success' ? '✅' : 'ℹ️', message, type);
         return;
     }
-    
-    // Fallback notification
     alert(message);
 }
 
-// ==================== PRODUCT CRUD OPERATIONS ====================
+// ==================== DATA FETCHING ====================
+async function loadCategories() {
+    const { data, error } = await supabaseClient
+        .from('categories')
+        .select('*')
+        .order('name_fr', { ascending: true });
 
-// Get all products (with optional filtering)
-function getProducts(filters = {}) {
-    let products = [...ProductsData.products];
-    
-    // Search filter
-    if (filters.search) {
-        const search = filters.search.toLowerCase();
-        products = products.filter(p => 
-            p.name_fr.toLowerCase().includes(search) ||
-            p.name_ar.toLowerCase().includes(search) ||
-            p.brand.toLowerCase().includes(search) ||
-            p.description_fr.toLowerCase().includes(search)
-        );
+    if (error) {
+        showNotification('Erreur lors du chargement des catégories', 'error');
+        return;
     }
-    
-    // Category filter
-    if (filters.category && filters.category !== 'all') {
-        products = products.filter(p => p.category_id === parseInt(filters.category));
+
+    State.categories = data || [];
+    populateCategoryDropdowns();
+}
+
+function populateCategoryDropdowns() {
+    // Filter dropdown
+    const filterSelect = DOM.categoryFilter;
+    const currentFilterValue = filterSelect.value;
+    filterSelect.innerHTML = '<option value="all">All Categories</option>' +
+        State.categories.map(cat => `<option value="${cat.id}">${cat.name_fr}</option>`).join('');
+    filterSelect.value = currentFilterValue || 'all';
+
+    // Modal form dropdown
+    const modalSelect = DOM.categoryId;
+    modalSelect.innerHTML = '<option value="">Select a category</option>' +
+        State.categories.map(cat => `<option value="${cat.id}">${cat.name_fr}</option>`).join('');
+}
+
+async function loadProducts() {
+    const { data, error } = await supabaseClient
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        showNotification('Erreur lors du chargement des produits', 'error');
+        return;
     }
-    
-    // Availability filter
-    if (filters.availability && filters.availability !== 'all') {
-        const available = filters.availability === 'available';
-        products = products.filter(p => p.is_available === available);
-    }
-    
-    // Featured filter
-    if (filters.featured && filters.featured !== 'all') {
-        const featured = filters.featured === 'featured';
-        products = products.filter(p => p.is_featured === featured);
-    }
-    
-    return products;
+
+    State.products = data || [];
+    renderProductsTable();
 }
 
-// Add new product
-function addProduct(productData) {
-    const newProduct = {
-        id: ProductsData._nextId++,
-        ...productData,
-        created_at: new Date().toISOString()
-    };
-    ProductsData.products.push(newProduct);
-    return newProduct;
-}
-
-// Update existing product
-function updateProduct(id, productData) {
-    const index = ProductsData.products.findIndex(p => p.id === id);
-    if (index === -1) return null;
-    
-    ProductsData.products[index] = {
-        ...ProductsData.products[index],
-        ...productData
-    };
-    return ProductsData.products[index];
-}
-
-// Delete product
-function deleteProduct(id) {
-    const index = ProductsData.products.findIndex(p => p.id === id);
-    if (index === -1) return false;
-    
-    ProductsData.products.splice(index, 1);
-    return true;
-}
-
-// Get product by ID
-function getProductById(id) {
-    return ProductsData.products.find(p => p.id === id);
-}
-
-// ==================== RENDER FUNCTIONS ====================
-
-function renderProductsTable() {
-    const search = DOM.searchInput.value.trim();
+// ==================== FILTERING (client-side) ====================
+function getFilteredProducts() {
+    const search = DOM.searchInput.value.trim().toLowerCase();
     const category = DOM.categoryFilter.value;
     const availability = DOM.availabilityFilter.value;
     const featured = DOM.featuredFilter.value;
-    
-    const filters = { search, category, availability, featured };
-    const products = getProducts(filters);
-    
-    // Update results count
+
+    let products = [...State.products];
+
+    if (search) {
+        products = products.filter(p =>
+            p.name_fr.toLowerCase().includes(search) ||
+            (p.name_ar || '').toLowerCase().includes(search) ||
+            (p.brand || '').toLowerCase().includes(search) ||
+            (p.description_fr || '').toLowerCase().includes(search)
+        );
+    }
+
+    if (category && category !== 'all') {
+        products = products.filter(p => p.category_id === category);
+    }
+
+    if (availability && availability !== 'all') {
+        const available = availability === 'available';
+        products = products.filter(p => p.is_available === available);
+    }
+
+    if (featured && featured !== 'all') {
+        const isFeatured = featured === 'featured';
+        products = products.filter(p => p.is_featured === isFeatured);
+    }
+
+    return products;
+}
+
+// ==================== RENDER ====================
+function renderProductsTable() {
+    const products = getFilteredProducts();
+
     DOM.resultsCount.textContent = `${products.length} product${products.length > 1 ? 's' : ''}`;
-    
-    // Show/hide empty state
+
     if (products.length === 0) {
         DOM.tableBody.innerHTML = '';
         DOM.emptyState.style.display = 'block';
         return;
     }
     DOM.emptyState.style.display = 'none';
-    
-    // Render table rows
+
     DOM.tableBody.innerHTML = products.map(product => `
         <tr>
             <td>
                 <div class="product-image-cell">
-                    ${product.image_url 
-                        ? `<img src="${product.image_url}" alt="${product.name_fr}" />` 
+                    ${product.image_url
+                        ? `<img src="${product.image_url}" alt="${product.name_fr}" />`
                         : `<i class="fas fa-capsules placeholder-icon"></i>`
                     }
                 </div>
@@ -331,7 +194,7 @@ function renderProductsTable() {
                     <span class="name-ar">${product.name_ar}</span>
                 </div>
             </td>
-            <td>${product.brand}</td>
+            <td>${product.brand || '-'}</td>
             <td>${getCategoryName(product.category_id)}</td>
             <td><strong>${formatPrice(product.price)}</strong></td>
             <td>${getStatusBadge(product)}</td>
@@ -351,34 +214,20 @@ function renderProductsTable() {
             </td>
         </tr>
     `).join('');
-    
-    // Attach event listeners to action buttons
+
     document.querySelectorAll('.view-btn').forEach(btn => {
-        btn.addEventListener('click', () => openViewModal(parseInt(btn.dataset.id)));
+        btn.addEventListener('click', () => openViewModal(btn.dataset.id));
     });
     document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', () => openEditModal(parseInt(btn.dataset.id)));
+        btn.addEventListener('click', () => openEditModal(btn.dataset.id));
     });
     document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', () => openDeleteModal(parseInt(btn.dataset.id)));
+        btn.addEventListener('click', () => openDeleteModal(btn.dataset.id));
     });
 }
 
 // ==================== MODAL FUNCTIONS ====================
 
-// Populate category dropdown
-function populateCategoryDropdown() {
-    const select = DOM.categoryId;
-    select.innerHTML = '<option value="">Select a category</option>';
-    ProductsData.categories.forEach(cat => {
-        const option = document.createElement('option');
-        option.value = cat.id;
-        option.textContent = cat.name_fr;
-        select.appendChild(option);
-    });
-}
-
-// Open Add Product Modal
 function openAddModal() {
     DOM.modalTitle.textContent = 'Add Product';
     DOM.productId.value = '';
@@ -387,18 +236,16 @@ function openAddModal() {
     DOM.isFeatured.checked = false;
     DOM.productModal.classList.add('active');
     document.body.style.overflow = 'hidden';
-    // Focus first input
     setTimeout(() => DOM.nameFr.focus(), 100);
 }
 
-// Open Edit Product Modal
 function openEditModal(id) {
-    const product = getProductById(id);
+    const product = State.products.find(p => p.id === id);
     if (!product) {
         showNotification('Product not found', 'error');
         return;
     }
-    
+
     DOM.modalTitle.textContent = 'Edit Product';
     DOM.productId.value = product.id;
     DOM.nameFr.value = product.name_fr;
@@ -406,26 +253,23 @@ function openEditModal(id) {
     DOM.descFr.value = product.description_fr || '';
     DOM.descAr.value = product.description_ar || '';
     DOM.price.value = product.price;
-    DOM.brand.value = product.brand;
-    DOM.categoryId.value = product.category_id;
+    DOM.brand.value = product.brand || '';
+    DOM.categoryId.value = product.category_id || '';
     DOM.imageUrl.value = product.image_url || '';
     DOM.isAvailable.checked = product.is_available;
     DOM.isFeatured.checked = product.is_featured;
-    
+
     DOM.productModal.classList.add('active');
     document.body.style.overflow = 'hidden';
 }
 
-// Open View Product Modal
 function openViewModal(id) {
-    const product = getProductById(id);
+    const product = State.products.find(p => p.id === id);
     if (!product) {
         showNotification('Product not found', 'error');
         return;
     }
-    
-    const category = ProductsData.categories.find(c => c.id === product.category_id);
-    
+
     DOM.viewProductContent.innerHTML = `
         <div class="view-product">
             ${product.image_url ? `
@@ -458,11 +302,11 @@ function openViewModal(id) {
             ` : ''}
             <div class="view-row">
                 <span class="view-label">Brand</span>
-                <span class="view-value">${product.brand}</span>
+                <span class="view-value">${product.brand || '-'}</span>
             </div>
             <div class="view-row">
                 <span class="view-label">Category</span>
-                <span class="view-value">${category ? category.name_fr : 'Non catégorisé'}</span>
+                <span class="view-value">${getCategoryName(product.category_id)}</span>
             </div>
             <div class="view-row">
                 <span class="view-label">Price</span>
@@ -487,35 +331,29 @@ function openViewModal(id) {
             <div class="view-row">
                 <span class="view-label">Created</span>
                 <span class="view-value">${new Date(product.created_at).toLocaleDateString('fr-FR', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
+                    day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
                 })}</span>
             </div>
         </div>
     `;
-    
+
     DOM.viewModal.classList.add('active');
     document.body.style.overflow = 'hidden';
 }
 
-// Open Delete Confirmation Modal
 function openDeleteModal(id) {
-    const product = getProductById(id);
+    const product = State.products.find(p => p.id === id);
     if (!product) {
         showNotification('Product not found', 'error');
         return;
     }
-    
+
     DOM.deleteProductName.textContent = product.name_fr;
     DOM.confirmDeleteBtn.dataset.id = id;
     DOM.deleteModal.classList.add('active');
     document.body.style.overflow = 'hidden';
 }
 
-// Close all modals
 function closeAllModals() {
     DOM.productModal.classList.remove('active');
     DOM.viewModal.classList.remove('active');
@@ -525,13 +363,12 @@ function closeAllModals() {
 
 // ==================== FORM HANDLING ====================
 
-function handleProductSubmit(e) {
+async function handleProductSubmit(e) {
     e.preventDefault();
-    
-    // Basic validation
+
     const requiredFields = ['nameFr', 'nameAr', 'price', 'brand', 'categoryId'];
     let isValid = true;
-    
+
     requiredFields.forEach(field => {
         const input = DOM[field];
         if (!input.value.trim()) {
@@ -541,12 +378,12 @@ function handleProductSubmit(e) {
             input.classList.remove('error');
         }
     });
-    
+
     if (!isValid) {
         showNotification('Please fill in all required fields', 'error');
         return;
     }
-    
+
     const productData = {
         name_fr: DOM.nameFr.value.trim(),
         name_ar: DOM.nameAr.value.trim(),
@@ -554,33 +391,41 @@ function handleProductSubmit(e) {
         description_ar: DOM.descAr.value.trim(),
         price: parseFloat(DOM.price.value),
         brand: DOM.brand.value.trim(),
-        category_id: parseInt(DOM.categoryId.value),
+        category_id: DOM.categoryId.value,
         image_url: DOM.imageUrl.value.trim(),
         is_available: DOM.isAvailable.checked,
         is_featured: DOM.isFeatured.checked
     };
-    
+
     const productId = DOM.productId.value;
-    let result;
-    
+    const saveBtn = DOM.saveProductBtn;
+    const originalHtml = saveBtn.innerHTML;
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+    let error;
     if (productId) {
-        // Update existing product
-        result = updateProduct(parseInt(productId), productData);
-        if (result) {
-            showNotification(`✅ Product "${result.name_fr}" updated successfully!`, 'success');
-        }
+        ({ error } = await supabaseClient.from('products').update(productData).eq('id', productId));
+        if (!error) showNotification(`✅ Product "${productData.name_fr}" updated successfully!`, 'success');
     } else {
-        // Add new product
-        result = addProduct(productData);
-        showNotification(`✅ Product "${result.name_fr}" added successfully!`, 'success');
+        ({ error } = await supabaseClient.from('products').insert([productData]));
+        if (!error) showNotification(`✅ Product "${productData.name_fr}" added successfully!`, 'success');
     }
-    
+
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = originalHtml;
+
+    if (error) {
+        console.error(error);
+        showNotification('Error saving product: ' + error.message, 'error');
+        return;
+    }
+
     closeAllModals();
-    renderProductsTable();
+    await loadProducts();
 }
 
 // ==================== FILTER HANDLING ====================
-
 function applyFilters() {
     renderProductsTable();
 }
@@ -593,8 +438,6 @@ function clearFilters() {
     renderProductsTable();
 }
 
-// ==================== SEARCH DEBOUNCE ====================
-
 function debounce(fn, delay) {
     let timeoutId;
     return function (...args) {
@@ -604,25 +447,24 @@ function debounce(fn, delay) {
 }
 
 // ==================== SIDEBAR TOGGLE ====================
-
 function initSidebar() {
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
-    
+
     const overlay = document.createElement('div');
     overlay.className = 'sidebar-overlay';
     overlay.id = 'sidebarOverlay';
     document.body.appendChild(overlay);
-    
+
     function toggleSidebar() {
         sidebar.classList.toggle('open');
         overlay.classList.toggle('active');
         document.body.classList.toggle('sidebar-open');
     }
-    
+
     menuToggle.addEventListener('click', toggleSidebar);
     overlay.addEventListener('click', toggleSidebar);
-    
+
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && sidebar.classList.contains('open')) {
             toggleSidebar();
@@ -632,49 +474,52 @@ function initSidebar() {
 
 // ==================== INITIALIZATION ====================
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Populate category dropdowns
-    populateCategoryDropdown();
-    
-    // Initial render
-    renderProductsTable();
-    
-    // Sidebar
+document.addEventListener('DOMContentLoaded', async function() {
+    await loadCategories();
+    await loadProducts();
+
     initSidebar();
-    
-    // Event Listeners
+
     DOM.addProductBtn.addEventListener('click', openAddModal);
     DOM.emptyAddBtn.addEventListener('click', openAddModal);
-    
-    // Form submission
+
     DOM.productForm.addEventListener('submit', handleProductSubmit);
-    
-    // Close modal buttons
+
     DOM.cancelModalBtn.addEventListener('click', closeAllModals);
     DOM.closeModal.addEventListener('click', closeAllModals);
     DOM.closeViewModal.addEventListener('click', closeAllModals);
     DOM.closeDeleteModal.addEventListener('click', closeAllModals);
     DOM.cancelDeleteBtn.addEventListener('click', closeAllModals);
-    
-    // Delete confirmation
-    DOM.confirmDeleteBtn.addEventListener('click', function() {
-        const id = parseInt(this.dataset.id);
-        const product = getProductById(id);
-        if (product && deleteProduct(id)) {
-            showNotification(`🗑️ Product "${product.name_fr}" deleted successfully!`, 'success');
-            closeAllModals();
-            renderProductsTable();
+
+    DOM.confirmDeleteBtn.addEventListener('click', async function() {
+        const id = this.dataset.id;
+        const product = State.products.find(p => p.id === id);
+        if (!product) return;
+
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+
+        const { error } = await supabaseClient.from('products').delete().eq('id', id);
+
+        this.disabled = false;
+        this.innerHTML = '<i class="fas fa-trash"></i> Delete Product';
+
+        if (error) {
+            showNotification('Error deleting product: ' + error.message, 'error');
+            return;
         }
+
+        showNotification(`🗑️ Product "${product.name_fr}" deleted successfully!`, 'success');
+        closeAllModals();
+        await loadProducts();
     });
-    
-    // Filters
+
     DOM.searchInput.addEventListener('input', debounce(applyFilters, 300));
     DOM.categoryFilter.addEventListener('change', applyFilters);
     DOM.availabilityFilter.addEventListener('change', applyFilters);
     DOM.featuredFilter.addEventListener('change', applyFilters);
     DOM.clearFiltersBtn.addEventListener('click', clearFilters);
-    
-    // Click outside modal to close
+
     document.querySelectorAll('.modal-overlay').forEach(overlay => {
         overlay.addEventListener('click', function(e) {
             if (e.target === this) {
@@ -682,21 +527,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
-    // Keyboard shortcut: Escape to close modals
+
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeAllModals();
         }
     });
-    
-    console.log('🚀 Products Management initialized');
-    console.log(`📦 ${ProductsData.products.length} products loaded`);
-});
 
-// ==================== EXPOSE FOR DEBUGGING ====================
-window.ProductsData = ProductsData;
-window.getProducts = getProducts;
-window.addProduct = addProduct;
-window.updateProduct = updateProduct;
-window.deleteProduct = deleteProduct;
+    console.log('🚀 Products Management initialized (Supabase)');
+});

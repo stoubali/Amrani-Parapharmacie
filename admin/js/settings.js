@@ -1,38 +1,34 @@
 /**
  * Amrani Parapharmacie - Settings Management Script
- * Handles website settings configuration with tabs and live preview
+ * The `settings` table holds a single row. We load it if it exists,
+ * and create it on first save if it doesn't.
  */
 
-// ==================== DEFAULT SETTINGS ====================
-const DEFAULT_SETTINGS = {
-    pharmacy_name: 'Amrani Parapharmacie',
+// ==================== STATE ====================
+let currentSettings = {
+    id: null,
+    pharmacy_name: '',
     logo_url: '',
-    hero_title_fr: 'Bienvenue à la Parapharmacie Amrani',
-    hero_title_ar: 'مرحباً بكم في صيدلية العمري',
-    hero_description_fr: 'Votre santé est notre priorité. Découvrez nos produits de qualité.',
-    hero_description_ar: 'صحتكم هي أولويتنا. اكتشفوا منتجاتنا عالية الجودة.',
-    phone: '05 22 33 44 55',
-    whatsapp: '06 12 34 56 78',
-    instagram: 'https://www.instagram.com/amrani_parapharmacie',
-    address: '123 Boulevard Mohammed V, Casablanca, Maroc',
-    opening_hours: 'Lun - Sam: 9h - 20h'
+    hero_title_fr: '',
+    hero_title_ar: '',
+    hero_description_fr: '',
+    hero_description_ar: '',
+    phone: '',
+    whatsapp: '',
+    instagram: '',
+    address: '',
+    opening_hours: ''
 };
-
-// ==================== CURRENT SETTINGS ====================
-let currentSettings = { ...DEFAULT_SETTINGS };
 
 // ==================== DOM REFERENCES ====================
 const DOM = {
-    // Tabs
     tabBtns: document.querySelectorAll('.tab-btn'),
     tabPanels: document.querySelectorAll('.tab-panel'),
 
-    // Pharmacy
     pharmacyName: document.getElementById('pharmacyName'),
     logoUrl: document.getElementById('logoUrl'),
     logoPreview: document.getElementById('logoPreview'),
 
-    // Hero
     heroTitleFr: document.getElementById('heroTitleFr'),
     heroTitleAr: document.getElementById('heroTitleAr'),
     heroDescFr: document.getElementById('heroDescFr'),
@@ -43,32 +39,26 @@ const DOM = {
     previewDescAr: document.getElementById('previewDescAr'),
     heroPreviewLogo: document.getElementById('heroPreviewLogo'),
 
-    // Contact
     phone: document.getElementById('phone'),
     whatsapp: document.getElementById('whatsapp'),
     address: document.getElementById('address'),
 
-    // Social
     instagram: document.getElementById('instagram'),
     instagramPreview: document.getElementById('instagramPreview'),
     instagramUsername: document.getElementById('instagramUsername'),
     socialPreview: document.getElementById('socialPreview'),
 
-    // Hours
     openingHours: document.getElementById('openingHours'),
     previewHours: document.getElementById('previewHours'),
 
-    // Actions
     saveBtn: document.getElementById('saveBtn'),
     resetBtn: document.getElementById('resetBtn'),
 
-    // Reset Modal
     resetModal: document.getElementById('resetModal'),
     confirmResetBtn: document.getElementById('confirmResetBtn'),
     cancelResetBtn: document.getElementById('cancelResetBtn'),
     closeResetModal: document.getElementById('closeResetModal'),
 
-    // Search
     searchInput: document.getElementById('searchInput')
 };
 
@@ -76,7 +66,7 @@ const DOM = {
 
 function showNotification(message, type = 'info') {
     if (window.showNotification) {
-        window.showNotification(message, type);
+        window.showNotification(type === 'error' ? '⚠️' : type === 'success' ? '✅' : 'ℹ️', message, type);
         return;
     }
 
@@ -115,38 +105,52 @@ function extractInstagramUsername(url) {
     return match ? match[1] : null;
 }
 
-// ==================== SETTINGS OPERATIONS ====================
+// ==================== DATA FETCHING ====================
 
-// Load settings into form
-function loadSettings() {
-    // Pharmacy
-    DOM.pharmacyName.value = currentSettings.pharmacy_name;
+async function loadSettingsFromDb() {
+    const { data, error } = await supabaseClient
+        .from('settings')
+        .select('*')
+        .limit(1)
+        .maybeSingle();
+
+    if (error) {
+        showNotification('Erreur lors du chargement des paramètres', 'error');
+        return;
+    }
+
+    if (data) {
+        currentSettings = { ...currentSettings, ...data };
+    }
+
+    loadSettingsIntoForm();
+}
+
+// ==================== FORM <-> STATE ====================
+
+function loadSettingsIntoForm() {
+    DOM.pharmacyName.value = currentSettings.pharmacy_name || '';
     DOM.logoUrl.value = currentSettings.logo_url || '';
     updateLogoPreview(currentSettings.logo_url);
 
-    // Hero
-    DOM.heroTitleFr.value = currentSettings.hero_title_fr;
-    DOM.heroTitleAr.value = currentSettings.hero_title_ar;
+    DOM.heroTitleFr.value = currentSettings.hero_title_fr || '';
+    DOM.heroTitleAr.value = currentSettings.hero_title_ar || '';
     DOM.heroDescFr.value = currentSettings.hero_description_fr || '';
     DOM.heroDescAr.value = currentSettings.hero_description_ar || '';
     updateHeroPreview();
     updateHeroLogo(currentSettings.logo_url);
 
-    // Contact
-    DOM.phone.value = currentSettings.phone;
+    DOM.phone.value = currentSettings.phone || '';
     DOM.whatsapp.value = currentSettings.whatsapp || '';
-    DOM.address.value = currentSettings.address;
+    DOM.address.value = currentSettings.address || '';
 
-    // Social
     DOM.instagram.value = currentSettings.instagram || '';
     updateInstagramPreview(currentSettings.instagram);
 
-    // Hours
-    DOM.openingHours.value = currentSettings.opening_hours;
+    DOM.openingHours.value = currentSettings.opening_hours || '';
     updateHoursPreview(currentSettings.opening_hours);
 }
 
-// Update logo preview in pharmacy tab
 function updateLogoPreview(url) {
     const preview = DOM.logoPreview;
     if (url && url.trim()) {
@@ -158,7 +162,6 @@ function updateLogoPreview(url) {
     }
 }
 
-// Update hero logo preview
 function updateHeroLogo(url) {
     const preview = DOM.heroPreviewLogo;
     if (url && url.trim()) {
@@ -170,7 +173,6 @@ function updateHeroLogo(url) {
     }
 }
 
-// Update hero preview
 function updateHeroPreview() {
     const titleFr = DOM.heroTitleFr.value || 'Hero Title (FR)';
     const titleAr = DOM.heroTitleAr.value || 'Hero Title (AR)';
@@ -183,7 +185,6 @@ function updateHeroPreview() {
     DOM.previewDescAr.textContent = descAr;
 }
 
-// Update Instagram preview
 function updateInstagramPreview(url) {
     const preview = DOM.instagramPreview;
     const usernameSpan = DOM.instagramUsername;
@@ -192,15 +193,12 @@ function updateInstagramPreview(url) {
         const username = extractInstagramUsername(url);
         if (username) {
             usernameSpan.textContent = `@${username}`;
-            preview.href = url;
-            preview.style.color = 'var(--primary)';
-            preview.style.pointerEvents = 'auto';
         } else {
             usernameSpan.textContent = url;
-            preview.href = url;
-            preview.style.color = 'var(--primary)';
-            preview.style.pointerEvents = 'auto';
         }
+        preview.href = url;
+        preview.style.color = 'var(--primary)';
+        preview.style.pointerEvents = 'auto';
     } else {
         usernameSpan.textContent = 'No Instagram account linked';
         preview.href = '#';
@@ -209,7 +207,6 @@ function updateInstagramPreview(url) {
     }
 }
 
-// Update hours preview
 function updateHoursPreview(hours) {
     const preview = DOM.previewHours;
     if (hours && hours.trim()) {
@@ -221,7 +218,6 @@ function updateHoursPreview(hours) {
     }
 }
 
-// Get settings from form
 function getSettingsFromForm() {
     return {
         pharmacy_name: DOM.pharmacyName.value.trim(),
@@ -238,59 +234,71 @@ function getSettingsFromForm() {
     };
 }
 
-// Validate settings
 function validateSettings(settings) {
     const errors = [];
 
-    if (!settings.pharmacy_name) {
-        errors.push('Pharmacy name is required');
-    }
-    if (!settings.hero_title_fr) {
-        errors.push('Hero title (French) is required');
-    }
-    if (!settings.hero_title_ar) {
-        errors.push('Hero title (Arabic) is required');
-    }
-    if (!settings.phone) {
-        errors.push('Phone number is required');
-    }
-    if (!settings.address) {
-        errors.push('Address is required');
-    }
-    if (!settings.opening_hours) {
-        errors.push('Opening hours are required');
-    }
+    if (!settings.pharmacy_name) errors.push('Pharmacy name is required');
+    if (!settings.hero_title_fr) errors.push('Hero title (French) is required');
+    if (!settings.hero_title_ar) errors.push('Hero title (Arabic) is required');
+    if (!settings.phone) errors.push('Phone number is required');
+    if (!settings.address) errors.push('Address is required');
+    if (!settings.opening_hours) errors.push('Opening hours are required');
 
     return errors;
 }
 
-// Save settings
-function saveSettings() {
-    const settings = getSettingsFromForm();
-    const errors = validateSettings(settings);
+// ==================== SAVE / RESET ====================
+
+async function saveSettings() {
+    const formValues = getSettingsFromForm();
+    const errors = validateSettings(formValues);
 
     if (errors.length > 0) {
-        showNotification(`❌ Please fix the following errors:\n${errors.join('\n')}`, 'error');
+        showNotification(`❌ ${errors.join(', ')}`, 'error');
         return false;
     }
 
-    currentSettings = { ...settings };
-    // Update all previews
-    updateHeroPreview();
-    updateHeroLogo(settings.logo_url);
-    updateInstagramPreview(settings.instagram);
-    updateHoursPreview(settings.opening_hours);
-    updateLogoPreview(settings.logo_url);
+    const saveBtn = DOM.saveBtn;
+    const originalHtml = saveBtn.innerHTML;
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+    let error, data;
+
+    if (currentSettings.id) {
+        ({ data, error } = await supabaseClient
+            .from('settings')
+            .update(formValues)
+            .eq('id', currentSettings.id)
+            .select()
+            .single());
+    } else {
+        ({ data, error } = await supabaseClient
+            .from('settings')
+            .insert([formValues])
+            .select()
+            .single());
+    }
+
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = originalHtml;
+
+    if (error) {
+        console.error(error);
+        showNotification('Error saving settings: ' + error.message, 'error');
+        return false;
+    }
+
+    currentSettings = { ...currentSettings, ...data };
+    loadSettingsIntoForm();
 
     showNotification('✅ Settings saved successfully!', 'success');
     return true;
 }
 
-// Reset settings to default
-function resetSettings() {
-    currentSettings = { ...DEFAULT_SETTINGS };
-    loadSettings();
-    showNotification('↩️ Settings reset to default', 'info');
+async function resetSettingsToSaved() {
+    await loadSettingsFromDb();
+    showNotification('↩️ Settings reset to last saved values', 'info');
     closeResetModal();
 }
 
@@ -311,12 +319,10 @@ function closeResetModal() {
 // ==================== TAB FUNCTIONS ====================
 
 function switchTab(tabId) {
-    // Update tab buttons
     DOM.tabBtns.forEach(btn => {
         btn.classList.toggle('active', btn.dataset.tab === tabId);
     });
 
-    // Update tab panels
     DOM.tabPanels.forEach(panel => {
         panel.classList.toggle('active', panel.id === `tab-${tabId}`);
     });
@@ -326,7 +332,6 @@ function switchTab(tabId) {
 
 function searchSettings(query) {
     if (!query.trim()) {
-        // Show all tabs and reset field styles
         DOM.tabPanels.forEach(panel => panel.style.display = '');
         document.querySelectorAll('.settings-card-body input, .settings-card-body textarea').forEach(field => {
             field.style.borderColor = '';
@@ -344,7 +349,6 @@ function searchSettings(query) {
         let hasMatch = false;
 
         fields.forEach(field => {
-            // Check if field value matches search
             if (field.value.toLowerCase().includes(search)) {
                 hasMatch = true;
                 field.style.borderColor = 'var(--primary)';
@@ -355,7 +359,6 @@ function searchSettings(query) {
             }
         });
 
-        // Also check labels
         const labels = panel.querySelectorAll('label');
         labels.forEach(label => {
             if (label.textContent.toLowerCase().includes(search)) {
@@ -405,21 +408,17 @@ function initSidebar() {
 
 // ==================== INITIALIZATION ====================
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Load settings
-    loadSettings();
+document.addEventListener('DOMContentLoaded', async function () {
+    await loadSettingsFromDb();
 
-    // Sidebar
     initSidebar();
 
-    // Tab switching
     DOM.tabBtns.forEach(btn => {
         btn.addEventListener('click', function () {
             switchTab(this.dataset.tab);
         });
     });
 
-    // Live preview updates
     DOM.heroTitleFr.addEventListener('input', updateHeroPreview);
     DOM.heroTitleAr.addEventListener('input', updateHeroPreview);
     DOM.heroDescFr.addEventListener('input', updateHeroPreview);
@@ -438,15 +437,8 @@ document.addEventListener('DOMContentLoaded', function () {
         updateHoursPreview(this.value);
     });
 
-    // Also update hero preview when logo changes in pharmacy tab
-    DOM.pharmacyName.addEventListener('input', function () {
-        // Optional: Update hero preview with pharmacy name
-    });
-
-    // Save button
     DOM.saveBtn.addEventListener('click', saveSettings);
 
-    // Keyboard shortcut: Ctrl+S to save
     document.addEventListener('keydown', function (e) {
         if ((e.ctrlKey || e.metaKey) && e.key === 's') {
             e.preventDefault();
@@ -454,22 +446,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Reset button
     DOM.resetBtn.addEventListener('click', openResetModal);
 
-    // Reset modal
-    DOM.confirmResetBtn.addEventListener('click', resetSettings);
+    DOM.confirmResetBtn.addEventListener('click', resetSettingsToSaved);
     DOM.cancelResetBtn.addEventListener('click', closeResetModal);
     DOM.closeResetModal.addEventListener('click', closeResetModal);
 
-    // Click outside modal to close
     DOM.resetModal.addEventListener('click', function (e) {
         if (e.target === this) {
             closeResetModal();
         }
     });
 
-    // Search functionality
     let searchTimeout;
     DOM.searchInput.addEventListener('input', function () {
         clearTimeout(searchTimeout);
@@ -478,20 +466,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 300);
     });
 
-    // Keyboard shortcut: Escape to close modals
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
             closeResetModal();
         }
     });
 
-    console.log('⚙️ Settings Management initialized');
-    console.log('📋 Settings loaded:', currentSettings);
+    console.log('⚙️ Settings Management initialized (Supabase)');
 });
-
-// ==================== EXPOSE FOR DEBUGGING ====================
-window.currentSettings = currentSettings;
-window.DEFAULT_SETTINGS = DEFAULT_SETTINGS;
-window.saveSettings = saveSettings;
-window.resetSettings = resetSettings;
-window.loadSettings = loadSettings;

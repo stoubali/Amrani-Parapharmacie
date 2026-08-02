@@ -1,82 +1,26 @@
 /**
  * Amrani Parapharmacie - Promotions Management Script
- * Handles promotion CRUD operations with modals and filters
+ * Full CRUD against the Supabase `promotions` table.
  */
 
-// ==================== DATA STORE ====================
-const PromotionsData = {
-    promotions: [
-        {
-            id: 1,
-            title_fr: 'Summer Sale',
-            title_ar: 'تخفيضات الصيف',
-            description_fr: 'Réduction sur tous les produits de la parapharmacie pendant l\'été.',
-            description_ar: 'تخفيض على جميع منتجات الصيدلية خلال الصيف.',
-            image_url: '',
-            active: true,
-            created_at: '2025-01-15T10:30:00'
-        },
-        {
-            id: 2,
-            title_fr: 'Special Offer - Vitamins',
-            title_ar: 'عرض خاص - الفيتامينات',
-            description_fr: 'Achetez 2 produits vitamines, obtenez le 3ème gratuit.',
-            description_ar: 'اشترِ منتجين من الفيتامينات واحصل على الثالث مجاناً.',
-            image_url: '',
-            active: true,
-            created_at: '2025-01-14T14:20:00'
-        },
-        {
-            id: 3,
-            title_fr: 'Winter Wellness',
-            title_ar: 'العناية الشتوية',
-            description_fr: 'Préparez-vous pour l\'hiver avec notre sélection de produits de santé.',
-            description_ar: 'استعدوا للشتاء مع مجموعتنا من المنتجات الصحية.',
-            image_url: '',
-            active: false,
-            created_at: '2024-12-20T09:15:00'
-        },
-        {
-            id: 4,
-            title_fr: 'New Year, New You',
-            title_ar: 'عام جديد، أنت جديد',
-            description_fr: 'Découvrez nos nouveautés pour bien commencer l\'année.',
-            description_ar: 'اكتشفوا منتجاتنا الجديدة لبداية ممتازة للسنة.',
-            image_url: '',
-            active: true,
-            created_at: '2025-01-01T08:00:00'
-        },
-        {
-            id: 5,
-            title_fr: 'Family Health Bundle',
-            title_ar: 'حزمة صحة العائلة',
-            description_fr: 'Ensemble de produits pour toute la famille à prix réduit.',
-            description_ar: 'مجموعة منتجات للعائلة بأكملها بسعر مخفض.',
-            image_url: '',
-            active: false,
-            created_at: '2024-12-10T11:45:00'
-        }
-    ],
-    _nextId: 6
+// ==================== STATE ====================
+const State = {
+    promotions: []
 };
 
 // ==================== DOM REFERENCES ====================
 const DOM = {
-    // Table
     tableBody: document.getElementById('promotionsTableBody'),
     resultsCount: document.getElementById('resultsCount'),
     emptyState: document.getElementById('emptyState'),
-    
-    // Filters
+
     searchInput: document.getElementById('searchInput'),
     statusFilter: document.getElementById('statusFilter'),
     clearFiltersBtn: document.getElementById('clearFiltersBtn'),
-    
-    // Add Button
+
     addPromotionBtn: document.getElementById('addPromotionBtn'),
     emptyAddBtn: document.getElementById('emptyAddBtn'),
-    
-    // Modal - Promotion Form
+
     promotionModal: document.getElementById('promotionModal'),
     modalTitle: document.getElementById('modalTitle'),
     promotionId: document.getElementById('promotionId'),
@@ -91,13 +35,11 @@ const DOM = {
     savePromotionBtn: document.getElementById('savePromotionBtn'),
     cancelModalBtn: document.getElementById('cancelModalBtn'),
     closeModal: document.getElementById('closeModal'),
-    
-    // Modal - View
+
     viewModal: document.getElementById('viewModal'),
     viewPromotionContent: document.getElementById('viewPromotionContent'),
     closeViewModal: document.getElementById('closeViewModal'),
-    
-    // Modal - Delete
+
     deleteModal: document.getElementById('deleteModal'),
     deletePromotionTitle: document.getElementById('deletePromotionTitle'),
     confirmDeleteBtn: document.getElementById('confirmDeleteBtn'),
@@ -109,21 +51,15 @@ const DOM = {
 
 function formatDate(dateString) {
     const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
-    });
+    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 function showNotification(message, type = 'info') {
-    // Reuse the notification system from dashboard
     if (window.showNotification) {
-        window.showNotification(message, type);
+        window.showNotification(type === 'error' ? '⚠️' : type === 'success' ? '✅' : 'ℹ️', message, type);
         return;
     }
-    
-    // Fallback notification
+
     const toast = document.createElement('div');
     toast.style.cssText = `
         position: fixed;
@@ -144,7 +80,7 @@ function showNotification(message, type = 'info') {
     `;
     toast.textContent = message;
     document.body.appendChild(toast);
-    
+
     setTimeout(() => {
         if (toast.parentNode) {
             toast.style.animation = 'slideOutRight 0.3s ease forwards';
@@ -153,111 +89,71 @@ function showNotification(message, type = 'info') {
     }, 4000);
 }
 
-// ==================== PROMOTION CRUD OPERATIONS ====================
+// ==================== DATA FETCHING ====================
 
-// Get all promotions (with optional filters)
-function getPromotions(filters = {}) {
-    let promotions = [...PromotionsData.promotions];
-    
-    // Search filter
-    if (filters.search) {
-        const search = filters.search.toLowerCase();
-        promotions = promotions.filter(p => 
+async function loadPromotions() {
+    const { data, error } = await supabaseClient
+        .from('promotions')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        showNotification('Erreur lors du chargement des promotions', 'error');
+        return;
+    }
+
+    State.promotions = data || [];
+    renderPromotionsTable();
+}
+
+// ==================== FILTERING ====================
+
+function getFilteredPromotions() {
+    const search = DOM.searchInput.value.trim().toLowerCase();
+    const status = DOM.statusFilter.value;
+
+    let promotions = [...State.promotions];
+
+    if (search) {
+        promotions = promotions.filter(p =>
             p.title_fr.toLowerCase().includes(search) ||
-            p.title_ar.includes(search) ||
-            p.description_fr.toLowerCase().includes(search)
+            (p.title_ar || '').includes(search) ||
+            (p.description_fr || '').toLowerCase().includes(search)
         );
     }
-    
-    // Status filter
-    if (filters.status && filters.status !== 'all') {
-        const active = filters.status === 'active';
+
+    if (status && status !== 'all') {
+        const active = status === 'active';
         promotions = promotions.filter(p => p.active === active);
     }
-    
-    // Sort by created date (newest first)
-    promotions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-    
+
     return promotions;
-}
-
-// Add new promotion
-function addPromotion(promotionData) {
-    const newPromotion = {
-        id: PromotionsData._nextId++,
-        ...promotionData,
-        created_at: new Date().toISOString()
-    };
-    PromotionsData.promotions.push(newPromotion);
-    return newPromotion;
-}
-
-// Update existing promotion
-function updatePromotion(id, promotionData) {
-    const index = PromotionsData.promotions.findIndex(p => p.id === id);
-    if (index === -1) return null;
-    
-    PromotionsData.promotions[index] = {
-        ...PromotionsData.promotions[index],
-        ...promotionData
-    };
-    return PromotionsData.promotions[index];
-}
-
-// Delete promotion
-function deletePromotion(id) {
-    const index = PromotionsData.promotions.findIndex(p => p.id === id);
-    if (index === -1) return false;
-    
-    PromotionsData.promotions.splice(index, 1);
-    return true;
-}
-
-// Get promotion by ID
-function getPromotionById(id) {
-    return PromotionsData.promotions.find(p => p.id === id);
-}
-
-// Toggle promotion status
-function togglePromotionStatus(id) {
-    const promotion = getPromotionById(id);
-    if (!promotion) return null;
-    
-    promotion.active = !promotion.active;
-    return promotion;
 }
 
 // ==================== RENDER FUNCTIONS ====================
 
 function renderPromotionsTable() {
-    const search = DOM.searchInput.value.trim();
-    const status = DOM.statusFilter.value;
-    
-    const filters = { search, status };
-    const promotions = getPromotions(filters);
-    
-    // Update results count
+    const promotions = getFilteredPromotions();
+
     DOM.resultsCount.textContent = `${promotions.length} promotion${promotions.length > 1 ? 's' : ''}`;
-    
-    // Show/hide empty state
+
     if (promotions.length === 0) {
         DOM.tableBody.innerHTML = '';
         DOM.emptyState.style.display = 'block';
         return;
     }
     DOM.emptyState.style.display = 'none';
-    
-    // Render table rows
+
     DOM.tableBody.innerHTML = promotions.map(promotion => {
         const statusClass = promotion.active ? 'active' : 'inactive';
         const statusText = promotion.active ? 'Active' : 'Inactive';
-        
+
         return `
             <tr>
                 <td>
                     <div class="promotion-image-cell">
-                        ${promotion.image_url 
-                            ? `<img src="${promotion.image_url}" alt="${promotion.title_fr}" />` 
+                        ${promotion.image_url
+                            ? `<img src="${promotion.image_url}" alt="${promotion.title_fr}" />`
                             : `<i class="fas fa-bullhorn placeholder-icon"></i>`
                         }
                     </div>
@@ -295,25 +191,23 @@ function renderPromotionsTable() {
             </tr>
         `;
     }).join('');
-    
-    // Attach event listeners to action buttons
+
     document.querySelectorAll('.view-btn').forEach(btn => {
-        btn.addEventListener('click', () => openViewModal(parseInt(btn.dataset.id)));
+        btn.addEventListener('click', () => openViewModal(btn.dataset.id));
     });
     document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', () => openEditModal(parseInt(btn.dataset.id)));
+        btn.addEventListener('click', () => openEditModal(btn.dataset.id));
     });
     document.querySelectorAll('.toggle-status-btn').forEach(btn => {
-        btn.addEventListener('click', () => handleToggleStatus(parseInt(btn.dataset.id)));
+        btn.addEventListener('click', () => handleToggleStatus(btn.dataset.id));
     });
     document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', () => openDeleteModal(parseInt(btn.dataset.id)));
+        btn.addEventListener('click', () => openDeleteModal(btn.dataset.id));
     });
 }
 
 // ==================== MODAL FUNCTIONS ====================
 
-// Open Add Promotion Modal
 function openAddModal() {
     DOM.promotionForm.reset();
     DOM.promotionId.value = '';
@@ -323,23 +217,22 @@ function openAddModal() {
     DOM.modalTitle.textContent = 'Add Promotion';
     DOM.saveBtnText.textContent = 'Save Promotion';
     DOM.savePromotionBtn.innerHTML = '<i class="fas fa-save"></i> Save Promotion';
-    
+
     DOM.promotionModal.classList.add('active');
     document.body.style.overflow = 'hidden';
-    
+
     setTimeout(() => {
         DOM.titleFr.focus();
     }, 150);
 }
 
-// Open Edit Promotion Modal
 function openEditModal(id) {
-    const promotion = getPromotionById(id);
+    const promotion = State.promotions.find(p => p.id === id);
     if (!promotion) {
         showNotification('Promotion not found', 'error');
         return;
     }
-    
+
     DOM.promotionId.value = promotion.id;
     DOM.titleFr.value = promotion.title_fr;
     DOM.titleAr.value = promotion.title_ar;
@@ -352,19 +245,18 @@ function openEditModal(id) {
     DOM.modalTitle.textContent = 'Edit Promotion';
     DOM.saveBtnText.textContent = 'Update Promotion';
     DOM.savePromotionBtn.innerHTML = '<i class="fas fa-save"></i> Update Promotion';
-    
+
     DOM.promotionModal.classList.add('active');
     document.body.style.overflow = 'hidden';
 }
 
-// Open View Promotion Modal
 function openViewModal(id) {
-    const promotion = getPromotionById(id);
+    const promotion = State.promotions.find(p => p.id === id);
     if (!promotion) {
         showNotification('Promotion not found', 'error');
         return;
     }
-    
+
     DOM.viewPromotionContent.innerHTML = `
         <div class="view-promotion">
             ${promotion.image_url ? `
@@ -406,35 +298,29 @@ function openViewModal(id) {
             <div class="view-row">
                 <span class="view-label">Created</span>
                 <span class="view-value">${new Date(promotion.created_at).toLocaleDateString('fr-FR', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
+                    day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
                 })}</span>
             </div>
         </div>
     `;
-    
+
     DOM.viewModal.classList.add('active');
     document.body.style.overflow = 'hidden';
 }
 
-// Open Delete Confirmation Modal
 function openDeleteModal(id) {
-    const promotion = getPromotionById(id);
+    const promotion = State.promotions.find(p => p.id === id);
     if (!promotion) {
         showNotification('Promotion not found', 'error');
         return;
     }
-    
+
     DOM.deletePromotionTitle.textContent = promotion.title_fr;
     DOM.confirmDeleteBtn.dataset.id = id;
     DOM.deleteModal.classList.add('active');
     document.body.style.overflow = 'hidden';
 }
 
-// Close all modals
 function closeAllModals() {
     DOM.promotionModal.classList.remove('active');
     DOM.viewModal.classList.remove('active');
@@ -444,29 +330,35 @@ function closeAllModals() {
 
 // ==================== STATUS TOGGLE ====================
 
-function handleToggleStatus(id) {
-    const promotion = togglePromotionStatus(id);
-    if (promotion) {
-        const status = promotion.active ? 'activated' : 'deactivated';
-        showNotification(`✅ Promotion "${promotion.title_fr}" ${status}!`, 'success');
-        renderPromotionsTable();
+async function handleToggleStatus(id) {
+    const promotion = State.promotions.find(p => p.id === id);
+    if (!promotion) return;
+
+    const newStatus = !promotion.active;
+    const { error } = await supabaseClient.from('promotions').update({ active: newStatus }).eq('id', id);
+
+    if (error) {
+        showNotification('Error updating status: ' + error.message, 'error');
+        return;
     }
+
+    const status = newStatus ? 'activated' : 'deactivated';
+    showNotification(`✅ Promotion "${promotion.title_fr}" ${status}!`, 'success');
+    await loadPromotions();
 }
 
 // ==================== FORM HANDLING ====================
 
-function handlePromotionSubmit(e) {
+async function handlePromotionSubmit(e) {
     e.preventDefault();
-    
-    // Get values and trim
+
     const titleFr = DOM.titleFr.value.trim();
     const titleAr = DOM.titleAr.value.trim();
     const descFr = DOM.descFr.value.trim();
     const descAr = DOM.descAr.value.trim();
     const imageUrl = DOM.imageUrl.value.trim();
     const isActive = DOM.isActive.checked;
-    
-    // Validate French title
+
     if (!titleFr) {
         DOM.titleFr.classList.add('error');
         DOM.titleFr.focus();
@@ -474,8 +366,7 @@ function handlePromotionSubmit(e) {
         return;
     }
     DOM.titleFr.classList.remove('error');
-    
-    // Validate Arabic title
+
     if (!titleAr) {
         DOM.titleAr.classList.add('error');
         DOM.titleAr.focus();
@@ -483,7 +374,7 @@ function handlePromotionSubmit(e) {
         return;
     }
     DOM.titleAr.classList.remove('error');
-    
+
     const promotionData = {
         title_fr: titleFr,
         title_ar: titleAr,
@@ -492,24 +383,33 @@ function handlePromotionSubmit(e) {
         image_url: imageUrl,
         active: isActive
     };
-    
+
     const promotionId = DOM.promotionId.value;
-    let result;
-    
+    const saveBtn = DOM.savePromotionBtn;
+    const originalHtml = saveBtn.innerHTML;
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+    let error;
     if (promotionId) {
-        // Update existing promotion
-        result = updatePromotion(parseInt(promotionId), promotionData);
-        if (result) {
-            showNotification(`✅ Promotion "${result.title_fr}" updated successfully!`, 'success');
-        }
+        ({ error } = await supabaseClient.from('promotions').update(promotionData).eq('id', promotionId));
+        if (!error) showNotification(`✅ Promotion "${titleFr}" updated successfully!`, 'success');
     } else {
-        // Add new promotion
-        result = addPromotion(promotionData);
-        showNotification(`✅ Promotion "${result.title_fr}" added successfully!`, 'success');
+        ({ error } = await supabaseClient.from('promotions').insert([promotionData]));
+        if (!error) showNotification(`✅ Promotion "${titleFr}" added successfully!`, 'success');
     }
-    
+
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = originalHtml;
+
+    if (error) {
+        console.error(error);
+        showNotification('Error saving promotion: ' + error.message, 'error');
+        return;
+    }
+
     closeAllModals();
-    renderPromotionsTable();
+    await loadPromotions();
 }
 
 // ==================== FILTER HANDLING ====================
@@ -524,8 +424,6 @@ function clearFilters() {
     renderPromotionsTable();
 }
 
-// ==================== SEARCH DEBOUNCE ====================
-
 function debounce(fn, delay) {
     let timeoutId;
     return function (...args) {
@@ -539,21 +437,21 @@ function debounce(fn, delay) {
 function initSidebar() {
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
-    
+
     const overlay = document.createElement('div');
     overlay.className = 'sidebar-overlay';
     overlay.id = 'sidebarOverlay';
     document.body.appendChild(overlay);
-    
+
     function toggleSidebar() {
         sidebar.classList.toggle('open');
         overlay.classList.toggle('active');
         document.body.classList.toggle('sidebar-open');
     }
-    
+
     menuToggle.addEventListener('click', toggleSidebar);
     overlay.addEventListener('click', toggleSidebar);
-    
+
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && sidebar.classList.contains('open')) {
             toggleSidebar();
@@ -563,51 +461,56 @@ function initSidebar() {
 
 // ==================== INITIALIZATION ====================
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Initial render
-    renderPromotionsTable();
-    
-    // Sidebar
+document.addEventListener('DOMContentLoaded', async function() {
+    await loadPromotions();
+
     initSidebar();
-    
-    // Event Listeners - Add buttons
+
     DOM.addPromotionBtn.addEventListener('click', function(e) {
         e.preventDefault();
         openAddModal();
     });
-    
+
     DOM.emptyAddBtn.addEventListener('click', function(e) {
         e.preventDefault();
         openAddModal();
     });
-    
-    // Form submission
+
     DOM.promotionForm.addEventListener('submit', handlePromotionSubmit);
-    
-    // Close modal buttons
+
     DOM.cancelModalBtn.addEventListener('click', closeAllModals);
     DOM.closeModal.addEventListener('click', closeAllModals);
     DOM.closeViewModal.addEventListener('click', closeAllModals);
     DOM.closeDeleteModal.addEventListener('click', closeAllModals);
     DOM.cancelDeleteBtn.addEventListener('click', closeAllModals);
-    
-    // Delete confirmation
-    DOM.confirmDeleteBtn.addEventListener('click', function() {
-        const id = parseInt(this.dataset.id);
-        const promotion = getPromotionById(id);
-        if (promotion && deletePromotion(id)) {
-            showNotification(`🗑️ Promotion "${promotion.title_fr}" deleted successfully!`, 'success');
-            closeAllModals();
-            renderPromotionsTable();
+
+    DOM.confirmDeleteBtn.addEventListener('click', async function() {
+        const id = this.dataset.id;
+        const promotion = State.promotions.find(p => p.id === id);
+        if (!promotion) return;
+
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+
+        const { error } = await supabaseClient.from('promotions').delete().eq('id', id);
+
+        this.disabled = false;
+        this.innerHTML = '<i class="fas fa-trash"></i> Delete Promotion';
+
+        if (error) {
+            showNotification('Error deleting promotion: ' + error.message, 'error');
+            return;
         }
+
+        showNotification(`🗑️ Promotion "${promotion.title_fr}" deleted successfully!`, 'success');
+        closeAllModals();
+        await loadPromotions();
     });
-    
-    // Filters
+
     DOM.searchInput.addEventListener('input', debounce(applyFilters, 300));
     DOM.statusFilter.addEventListener('change', applyFilters);
     DOM.clearFiltersBtn.addEventListener('click', clearFilters);
-    
-    // Click outside modal to close
+
     document.querySelectorAll('.modal-overlay').forEach(overlay => {
         overlay.addEventListener('click', function(e) {
             if (e.target === this) {
@@ -615,22 +518,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
-    // Keyboard shortcut: Escape to close modals
+
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeAllModals();
         }
     });
-    
-    console.log('📢 Promotions Management initialized');
-    console.log(`🎯 ${PromotionsData.promotions.length} promotions loaded`);
-});
 
-// ==================== EXPOSE FOR DEBUGGING ====================
-window.PromotionsData = PromotionsData;
-window.getPromotions = getPromotions;
-window.addPromotion = addPromotion;
-window.updatePromotion = updatePromotion;
-window.deletePromotion = deletePromotion;
-window.togglePromotionStatus = togglePromotionStatus;
+    console.log('📢 Promotions Management initialized (Supabase)');
+});
