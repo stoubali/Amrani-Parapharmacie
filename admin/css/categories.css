@@ -1,0 +1,210 @@
+/* ==================== CATEGORIES PAGE SPECIFIC STYLES ==================== */
+
+/* Categories Table */
+.categories-table td {
+    vertical-align: middle;
+}
+
+.category-image-cell {
+    width: 50px;
+    height: 50px;
+    border-radius: var(--border-radius-sm);
+    overflow: hidden;
+    background: var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.category-image-cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.category-image-cell .placeholder-icon {
+    color: var(--gray-400);
+    font-size: 22px;
+}
+
+.category-name-cell {
+    font-weight: 500;
+    color: var(--gray-800);
+}
+
+.category-name-ar {
+    font-size: 14px;
+    color: var(--gray-600);
+    margin-left: 8px;
+    font-weight: 400;
+}
+
+.category-name-ar::before {
+    content: '(';
+    color: var(--gray-400);
+}
+
+.category-name-ar::after {
+    content: ')';
+    color: var(--gray-400);
+}
+
+/* Product count badge */
+.product-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 28px;
+    padding: 0 10px;
+    background: var(--primary-bg);
+    color: var(--primary);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.product-count-badge.zero {
+    background: var(--gray-100);
+    color: var(--gray-400);
+}
+
+/* Action buttons - reuse from products.css */
+.action-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.action-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all var(--transition);
+    background: transparent;
+    color: var(--gray-500);
+}
+
+.action-btn:hover {
+    background: var(--gray-100);
+    color: var(--gray-700);
+}
+
+.action-btn.edit-btn:hover {
+    background: var(--primary-bg);
+    color: var(--primary);
+}
+
+.action-btn.delete-btn:hover {
+    background: #FEE2E2;
+    color: var(--danger);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-state i {
+    font-size: 64px;
+    color: var(--gray-300);
+    margin-bottom: 16px;
+}
+
+.empty-state h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    color: var(--gray-500);
+    margin-bottom: 20px;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+    .categories-table {
+        font-size: 13px;
+    }
+
+    .categories-table th,
+    .categories-table td {
+        padding: 8px 6px;
+    }
+
+    .category-image-cell {
+        width: 40px;
+        height: 40px;
+    }
+
+    .category-image-cell .placeholder-icon {
+        font-size: 18px;
+    }
+
+    .category-name-ar {
+        font-size: 12px;
+        display: block;
+        margin-left: 0;
+    }
+
+    .category-name-ar::before,
+    .category-name-ar::after {
+        display: none;
+    }
+
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+
+    .product-count-badge {
+        min-width: 28px;
+        height: 24px;
+        font-size: 12px;
+        padding: 0 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Hide image column on very small screens */
+    .categories-table .hide-mobile {
+        display: none;
+    }
+
+    .categories-table th,
+    .categories-table td {
+        padding: 6px 4px;
+        font-size: 12px;
+    }
+
+    .category-image-cell {
+        width: 32px;
+        height: 32px;
+    }
+
+    .category-image-cell .placeholder-icon {
+        font-size: 14px;
+    }
+}
+
+/* Modal form adjustments for categories */
+#categoryForm .form-grid {
+    grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 768px) {
+    #categoryForm .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
