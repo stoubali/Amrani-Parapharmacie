@@ -113,19 +113,19 @@
             <!-- Settings Tabs -->
             <div class="settings-tabs">
                 <button class="tab-btn active" data-tab="pharmacy">
-                    <i class="fas fa-store"></i> Pharmacy
+                    <i class="fas fa-store"></i> <span>Pharmacy</span>
                 </button>
                 <button class="tab-btn" data-tab="hero">
-                    <i class="fas fa-image"></i> Hero
+                    <i class="fas fa-image"></i> <span>Hero</span>
                 </button>
                 <button class="tab-btn" data-tab="contact">
-                    <i class="fas fa-phone"></i> Contact
+                    <i class="fas fa-phone"></i> <span>Contact</span>
                 </button>
                 <button class="tab-btn" data-tab="social">
-                    <i class="fas fa-share-alt"></i> Social
+                    <i class="fas fa-share-alt"></i> <span>Social</span>
                 </button>
                 <button class="tab-btn" data-tab="hours">
-                    <i class="fas fa-clock"></i> Hours
+                    <i class="fas fa-clock"></i> <span>Hours</span>
                 </button>
             </div>
 
@@ -192,7 +192,10 @@
                             
                             <!-- Hero Preview -->
                             <div class="hero-preview">
-                                <div class="hero-preview-content">
+                                <div class="hero-preview-content" id="heroPreviewContent">
+                                    <div class="hero-preview-logo" id="heroPreviewLogo">
+                                        <i class="fas fa-plus-circle"></i>
+                                    </div>
                                     <h4 id="previewTitleFr">Bienvenue à la Parapharmacie Amrani</h4>
                                     <h4 id="previewTitleAr" dir="rtl">مرحباً بكم في صيدلية العمري</h4>
                                     <p id="previewDescFr">Votre santé est notre priorité</p>
@@ -218,10 +221,12 @@
                                 <div class="form-group">
                                     <label for="phone">Phone Number <span class="required">*</span></label>
                                     <input type="text" id="phone" placeholder="e.g., 05 22 33 44 55" />
+                                    <span class="hint">Include country code if needed</span>
                                 </div>
                                 <div class="form-group">
                                     <label for="whatsapp">WhatsApp Number</label>
                                     <input type="text" id="whatsapp" placeholder="e.g., 06 12 34 56 78" />
+                                    <span class="hint">For WhatsApp chat button on website</span>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -245,11 +250,12 @@
                                     <i class="fab fa-instagram" style="color: #E1306C;"></i> Instagram URL
                                 </label>
                                 <input type="url" id="instagram" placeholder="https://www.instagram.com/yourpharmacy" />
+                                <span class="hint">Your Instagram profile URL</span>
                             </div>
-                            <div class="social-preview">
+                            <div class="social-preview" id="socialPreview">
                                 <span class="social-preview-label">Preview:</span>
-                                <a href="#" id="instagramPreview" target="_blank" style="color: var(--gray-500); text-decoration: none;">
-                                    <i class="fab fa-instagram"></i> @amrani_parapharmacie
+                                <a href="#" id="instagramPreview" target="_blank">
+                                    <i class="fab fa-instagram"></i> <span id="instagramUsername">@amrani_parapharmacie</span>
                                 </a>
                             </div>
                         </div>
@@ -268,6 +274,17 @@
                                 <label for="openingHours">Opening Hours <span class="required">*</span></label>
                                 <input type="text" id="openingHours" placeholder="e.g., Lun - Sam: 9h - 20h" />
                                 <span class="hint">Example: Mon - Fri: 9:00 AM - 8:00 PM</span>
+                            </div>
+                            
+                            <!-- Hours Preview -->
+                            <div class="hours-preview">
+                                <div class="hours-preview-header">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Current Hours Display</span>
+                                </div>
+                                <div class="hours-preview-content" id="hoursPreviewContent">
+                                    <span id="previewHours">Lun - Sam: 9h - 20h</span>
+                                </div>
                             </div>
                         </div>
                     </div>

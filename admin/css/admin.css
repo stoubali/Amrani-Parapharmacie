@@ -4,7 +4,7 @@
     --primary-dark: #1B5E20;
     --primary-light: #4CAF50;
     --primary-bg: #E8F5E9;
-    
+
     --gray-50: #F9FAFB;
     --gray-100: #F3F4F6;
     --gray-200: #E5E7EB;
@@ -15,26 +15,26 @@
     --gray-700: #374151;
     --gray-800: #1F2937;
     --gray-900: #111827;
-    
+
     --white: #FFFFFF;
     --black: #000000;
-    
+
     --success: #10B981;
     --warning: #F59E0B;
     --danger: #EF4444;
     --info: #3B82F6;
-    
+
     --sidebar-width: 250px;
     --navbar-height: 70px;
     --border-radius: 12px;
     --border-radius-sm: 8px;
-    
+
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    
+
     --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -52,6 +52,10 @@ body {
     line-height: 1.6;
     display: flex;
     min-height: 100vh;
+}
+
+body.modal-open {
+    overflow: hidden;
 }
 
 a {
@@ -85,6 +89,105 @@ ul {
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--gray-400);
+}
+
+/* ==================== MODALS ==================== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(17, 24, 39, 0.55);
+    backdrop-filter: blur(4px);
+    z-index: 2147483647;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    position: relative;
+    background: var(--white);
+    border-radius: var(--border-radius);
+    width: min(100%, 700px);
+    max-width: 700px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+}
+
+.modal.modal-view {
+    max-width: 600px;
+}
+
+.modal.modal-delete {
+    max-width: 480px;
+}
+
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.modal-close {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: var(--gray-100);
+    color: var(--gray-500);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.modal-close:hover {
+    background: var(--gray-200);
+    color: var(--gray-700);
+}
+
+.modal-body {
+    padding: 24px;
+    overflow-y: auto;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.delete-confirm {
+    text-align: center;
+    padding: 8px 0 16px;
+}
+
+.delete-confirm i {
+    font-size: 42px;
+    color: var(--danger);
+    margin-bottom: 12px;
+}
+
+.delete-warning {
+    margin-top: 8px;
+    color: var(--gray-500);
+    font-size: 13px;
 }
 
 /* ==================== SIDEBAR ==================== */
@@ -764,45 +867,45 @@ ul {
     .sidebar {
         transform: translateX(-100%);
     }
-    
+
     .sidebar.open {
         transform: translateX(0);
     }
-    
+
     .main-wrapper {
         margin-left: 0;
     }
-    
+
     .menu-toggle {
         display: block;
     }
-    
+
     .top-navbar {
         padding: 0 16px;
     }
-    
+
     .page-content {
         padding: 16px;
     }
-    
+
     .page-header {
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .stats-grid {
         grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
         gap: 12px;
     }
-    
+
     .stat-card {
         padding: 16px;
     }
-    
+
     .stat-number {
         font-size: 22px;
     }
-    
+
     .navbar-search {
         max-width: 200px;
     }
@@ -812,11 +915,11 @@ ul {
     .navbar-search {
         display: none;
     }
-    
+
     .stats-grid {
         grid-template-columns: 1fr 1fr;
     }
-    
+
     .actions-grid {
         grid-template-columns: 1fr 1fr;
     }
