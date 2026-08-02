@@ -85,6 +85,7 @@ const DOM = {
     saveBtnText: document.getElementById('saveBtnText'),
     cancelModalBtn: document.getElementById('cancelModalBtn'),
     closeModal: document.getElementById('closeModal'),
+    saveCategoryBtn: document.getElementById('saveCategoryBtn'),
     
     // Modal - Delete
     deleteModal: document.getElementById('deleteModal'),
@@ -98,11 +99,6 @@ const DOM = {
 
 function getProductCount(categoryId) {
     return CategoriesData.productCounts[categoryId] || 0;
-}
-
-function getInitials(name) {
-    if (!name) return '?';
-    return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
 }
 
 function showNotification(message, type = 'info') {
@@ -276,14 +272,24 @@ function renderCategoriesTable() {
 
 // Open Add Category Modal
 function openAddModal() {
+    // Reset form completely
+    DOM.categoryForm.reset();
+    DOM.categoryId.value = '';
+    DOM.nameFr.classList.remove('error');
+    DOM.nameAr.classList.remove('error');
+    DOM.imageUrl.value = '';
     DOM.modalTitle.textContent = 'Add Category';
     DOM.saveBtnText.textContent = 'Save Category';
-    DOM.categoryId.value = '';
-    DOM.categoryForm.reset();
+    DOM.saveCategoryBtn.innerHTML = '<i class="fas fa-save"></i> Save Category';
+    
+    // Show modal
     DOM.categoryModal.classList.add('active');
     document.body.style.overflow = 'hidden';
-    // Focus first input
-    setTimeout(() => DOM.nameFr.focus(), 100);
+    
+    // Focus first input after a small delay
+    setTimeout(() => {
+        DOM.nameFr.focus();
+    }, 150);
 }
 
 // Open Edit Category Modal
@@ -294,12 +300,15 @@ function openEditModal(id) {
         return;
     }
     
-    DOM.modalTitle.textContent = 'Edit Category';
-    DOM.saveBtnText.textContent = 'Update Category';
     DOM.categoryId.value = category.id;
     DOM.nameFr.value = category.name_fr;
     DOM.nameAr.value = category.name_ar;
     DOM.imageUrl.value = category.image_url || '';
+    DOM.nameFr.classList.remove('error');
+    DOM.nameAr.classList.remove('error');
+    DOM.modalTitle.textContent = 'Edit Category';
+    DOM.saveBtnText.textContent = 'Update Category';
+    DOM.saveCategoryBtn.innerHTML = '<i class="fas fa-save"></i> Update Category';
     
     DOM.categoryModal.classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -331,22 +340,25 @@ function closeAllModals() {
 function handleCategorySubmit(e) {
     e.preventDefault();
     
-    // Basic validation
+    // Get values and trim
     const nameFr = DOM.nameFr.value.trim();
     const nameAr = DOM.nameAr.value.trim();
+    const imageUrl = DOM.imageUrl.value.trim();
     
+    // Validate French name
     if (!nameFr) {
         DOM.nameFr.classList.add('error');
-        showNotification('Please enter the French name', 'error');
         DOM.nameFr.focus();
+        showNotification('Please enter the French name', 'error');
         return;
     }
     DOM.nameFr.classList.remove('error');
     
+    // Validate Arabic name
     if (!nameAr) {
         DOM.nameAr.classList.add('error');
-        showNotification('Please enter the Arabic name', 'error');
         DOM.nameAr.focus();
+        showNotification('Please enter the Arabic name', 'error');
         return;
     }
     DOM.nameAr.classList.remove('error');
@@ -354,7 +366,7 @@ function handleCategorySubmit(e) {
     const categoryData = {
         name_fr: nameFr,
         name_ar: nameAr,
-        image_url: DOM.imageUrl.value.trim()
+        image_url: imageUrl
     };
     
     const categoryId = DOM.categoryId.value;
@@ -412,9 +424,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Sidebar
     initSidebar();
     
-    // Event Listeners
-    DOM.addCategoryBtn.addEventListener('click', openAddModal);
-    DOM.emptyAddBtn.addEventListener('click', openAddModal);
+    // Event Listeners - Add buttons
+    DOM.addCategoryBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        openAddModal();
+    });
+    
+    DOM.emptyAddBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        openAddModal();
+    });
     
     // Form submission
     DOM.categoryForm.addEventListener('submit', handleCategorySubmit);
