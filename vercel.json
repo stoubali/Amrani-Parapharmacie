@@ -3,23 +3,15 @@
     "routes": [
         {
             "src": "/",
-            "dest": "/public/index.html"
+            "dest": "/index.html"
         },
         {
             "src": "/landing.html",
-            "dest": "/public/index.html"
+            "dest": "/index.html"
         },
         {
             "src": "/products.html",
-            "dest": "/public/products.html"
-        },
-        {
-            "src": "/css/(.*)",
-            "dest": "/public/css/$1"
-        },
-        {
-            "src": "/js/(.*)",
-            "dest": "/public/js/$1"
+            "dest": "/products.html"
         },
         {
             "src": "/admin/?$",
