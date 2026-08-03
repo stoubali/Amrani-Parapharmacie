@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Amrani Parapharmacie</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #f5f7fb;
+        --surface: #ffffff;
+        --surface-2: #f8fafc;
+        --border: #e2e8f0;
+        --text: #0f172a;
+        --muted: #64748b;
+        --primary: #2e7d32;
+        --primary-2: #1b5e20;
+        --accent: #e8f5e9;
+        --danger: #dc2626;
+        --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      .app {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        padding: 24px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+        font-size: 1.08rem;
+        padding: 8px 10px;
+      }
+
+      .brand-badge {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: var(--primary);
+        color: white;
+        display: grid;
+        place-items: center;
+        font-size: 1.1rem;
+      }
+
+      .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 11px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        color: var(--muted);
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        color: var(--primary-2);
+        background: var(--accent);
+      }
+
+      .main {
+        padding: 24px;
+      }
+
+      .topbar {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 16px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: var(--shadow);
+      }
+
+      .page-title h1 { margin: 0; font-size: 1.2rem; }
+      .page-title p { margin: 4px 0 0; color: var(--muted); }
+
+      .btn {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .btn-primary { background: var(--primary); color: white; }
+      .btn-secondary { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+
+      .content { margin-top: 20px; }
+      .panel { display: none; }
+      .panel.active { display: block; }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 18px;
+        box-shadow: var(--shadow);
+      }
+
+      .card h3 { margin: 0 0 8px; font-size: 0.95rem; color: var(--muted); }
+      .card .value { font-size: 1.6rem; font-weight: 700; }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 16px;
+      }
+
+      .table-wrap, .list-wrap, .form-wrap {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 18px;
+        box-shadow: var(--shadow);
+      }
+
+      table { width: 100%; border-collapse: collapse; }
+      th, td { padding: 10px 8px; border-bottom: 1px solid var(--border); text-align: left; }
+      th { color: var(--muted); font-size: 0.85rem; text-transform: uppercase; }
+
+      .chip {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        background: var(--accent);
+        color: var(--primary-2);
+      }
+
+      .form-grid { display: grid; gap: 12px; }
+      .field { display: grid; gap: 6px; }
+      .field input, .field textarea, .field select {
+        width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font: inherit;
+      }
+
+      .pill-list { display: flex; flex-wrap: wrap; gap: 8px; }
+      .pill { padding: 8px 12px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); }
+
+      @media (max-width: 960px) {
+        .app { grid-template-columns: 1fr; }
+        .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+        .cards { grid-template-columns: 1fr 1fr; }
+        .grid-2 { grid-template-columns: 1fr; }
+      }
+
+      @media (max-width: 640px) {
+        .cards { grid-template-columns: 1fr; }
+        .topbar { flex-direction: column; align-items: flex-start; gap: 10px; }
+        .main { padding: 16px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-badge">A</div>
+          <div>Amrani Admin</div>
+        </div>
+        <a class="nav-link active" data-route="dashboard"><span>📊</span> Dashboard</a>
+        <a class="nav-link" data-route="products"><span>💊</span> Produits</a>
+        <a class="nav-link" data-route="categories"><span>🏷️</span> Catégories</a>
+        <a class="nav-link" data-route="promotions"><span>🎉</span> Promotions</a>
+        <a class="nav-link" data-route="messages"><span>💬</span> Messages</a>
+        <a class="nav-link" data-route="settings"><span>⚙️</span> Paramètres</a>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="page-title">
+            <h1 id="pageTitle">Dashboard</h1>
+            <p id="pageSubtitle">Vue générale du magasin</p>
+          </div>
+          <button class="btn btn-primary">+ Ajouter</button>
+        </header>
+
+        <section class="content">
+          <div class="panel active" data-section="dashboard">
+            <div class="cards">
+              <div class="card"><h3>Produits</h3><div class="value" id="prodCount">24</div></div>
+              <div class="card"><h3>Catégories</h3><div class="value" id="catCount">8</div></div>
+              <div class="card"><h3>Promotions</h3><div class="value">3</div></div>
+              <div class="card"><h3>Messages</h3><div class="value">5</div></div>
+            </div>
+
+            <div class="grid-2">
+              <div class="table-wrap">
+                <h3>Produits récents</h3>
+                <table>
+                  <thead><tr><th>Produit</th><th>Catégorie</th><th>Prix</th><th>Statut</th></tr></thead>
+                  <tbody>
+                    <tr><td>Vitamine C</td><td>Compléments</td><td>19,90</td><td><span class="chip">Actif</span></td></tr>
+                    <tr><td>Gel hydroalcoolique</td><td>Hygiène</td><td>8,50</td><td><span class="chip">Actif</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="list-wrap">
+                <h3>Activités récentes</h3>
+                <div class="pill-list">
+                  <span class="pill">Produit ajouté</span>
+                  <span class="pill">Promotion activée</span>
+                  <span class="pill">Message reçu</span>
+                  <span class="pill">Catégorie mise à jour</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel" data-section="products">
+            <div class="grid-2">
+              <div class="table-wrap">
+                <h3>Gestion des produits</h3>
+                <table>
+                  <thead><tr><th>Nom</th><th>Marque</th><th>Prix</th><th>Stock</th></tr></thead>
+                  <tbody>
+                    <tr><td>Vitamine D3</td><td>Amrani</td><td>24,00</td><td>12</td></tr>
+                    <tr><td>Masque FFP2</td><td>Health</td><td>6,90</td><td>40</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="form-wrap">
+                <h3>Nouveau produit</h3>
+                <div class="form-grid">
+                  <div class="field"><label>Nom</label><input type="text" placeholder="Nom du produit" /></div>
+                  <div class="field"><label>Prix</label><input type="text" placeholder="0,00" /></div>
+                  <div class="field"><label>Catégorie</label><select><option>Compléments</option><option>Hygiène</option><option>Soins</option></select></div>
+                  <button class="btn btn-primary">Enregistrer</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel" data-section="categories">
+            <div class="grid-2">
+              <div class="table-wrap">
+                <h3>Catégories</h3>
+                <table>
+                  <thead><tr><th>Nom</th><th>Produits</th><th>État</th></tr></thead>
+                  <tbody>
+                    <tr><td>Compléments</td><td>10</td><td><span class="chip">Publiée</span></td></tr>
+                    <tr><td>Hygiène</td><td>7</td><td><span class="chip">Publiée</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="form-wrap">
+                <h3>Ajouter une catégorie</h3>
+                <div class="form-grid">
+                  <div class="field"><label>Nom</label><input type="text" placeholder="Nom de la catégorie" /></div>
+                  <div class="field"><label>Description</label><textarea rows="4"></textarea></div>
+                  <button class="btn btn-primary">Créer</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel" data-section="promotions">
+            <div class="table-wrap">
+              <h3>Promotions actives</h3>
+              <table>
+                <thead><tr><th>Titre</th><th>Produit</th><th>Réduction</th><th>Fin</th></tr></thead>
+                <tbody>
+                  <tr><td>Offre du mois</td><td>Vitamine C</td><td>15%</td><td>10/08</td></tr>
+                  <tr><td>Pack soin</td><td>Gel hydroalcoolique</td><td>10%</td><td>15/08</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel" data-section="messages">
+            <div class="table-wrap">
+              <h3>Messages reçus</h3>
+              <table>
+                <thead><tr><th>Nom</th><th>Sujet</th><th>Message</th><th>État</th></tr></thead>
+                <tbody>
+                  <tr><td>Fatima</td><td>Disponibilité</td><td>Bonjour, est-ce que ce produit est en stock ?</td><td><span class="chip">Nouveau</span></td></tr>
+                  <tr><td>Karim</td><td>Livraison</td><td>Je souhaite une livraison demain.</td><td><span class="chip">Lu</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel" data-section="settings">
+            <div class="grid-2">
+              <div class="form-wrap">
+                <h3>Informations du magasin</h3>
+                <div class="form-grid">
+                  <div class="field"><label>Nom</label><input type="text" value="Amrani Parapharmacie" /></div>
+                  <div class="field"><label>Téléphone</label><input type="text" value="05 22 00 00 00" /></div>
+                  <div class="field"><label>Adresse</label><textarea rows="3">12 rue de la Santé</textarea></div>
+                  <button class="btn btn-primary">Sauvegarder</button>
+                </div>
+              </div>
+              <div class="list-wrap">
+                <h3>Préférences</h3>
+                <div class="pill-list">
+                  <span class="pill">Affichage FR</span>
+                  <span class="pill">WhatsApp activé</span>
+                  <span class="pill">Horaires publics</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const navLinks = document.querySelectorAll('.nav-link');
+      const panels = document.querySelectorAll('.panel');
+      const title = document.getElementById('pageTitle');
+      const subtitle = document.getElementById('pageSubtitle');
+
+      const titles = {
+        dashboard: ['Dashboard', 'Vue générale du magasin'],
+        products: ['Produits', 'Gestion des produits et stock'],
+        categories: ['Catégories', 'Organisation des rayons'],
+        promotions: ['Promotions', 'Offres et remises'],
+        messages: ['Messages', 'Boîte de réception'],
+        settings: ['Paramètres', 'Configuration du magasin']
+      };
+
+      function showSection(section) {
+        const key = section || 'dashboard';
+        navLinks.forEach(link => link.classList.toggle('active', link.dataset.route === key));
+        panels.forEach(panel => panel.classList.toggle('active', panel.dataset.section === key));
+        const [newTitle, newSubtitle] = titles[key] || titles.dashboard;
+        title.textContent = newTitle;
+        subtitle.textContent = newSubtitle;
+        const routePath = key === 'dashboard' ? '/admin' : `/admin/${key}`;
+        window.history.replaceState({}, '', routePath);
+      }
+
+      navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          showSection(link.dataset.route);
+        });
+      });
+
+      const current = window.location.pathname.replace(/^\/admin\/?/, '').split('/')[0] || 'dashboard';
+      showSection(current);
+    </script>
+  </body>
+</html>

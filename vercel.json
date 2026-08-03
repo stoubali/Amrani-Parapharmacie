@@ -23,11 +23,11 @@
         },
         {
             "src": "/admin/?$",
-            "dest": "/admin/index.html"
+            "dest": "/admin.html"
         },
         {
             "src": "/admin/(.*)",
-            "dest": "/admin/$1"
+            "dest": "/admin.html"
         }
     ]
 }
