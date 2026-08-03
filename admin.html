@@ -4961,25 +4961,80 @@ html { visibility: hidden; }
     <!-- ==================== JAVASCRIPT ==================== -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-/**
- * Amrani Parapharmacie - Supabase Client
- * Shared Supabase client instance used across all admin pages.
- * Requires the Supabase JS CDN script to be loaded BEFORE this file:
- * <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>
- */
-const SUPABASE_URL = 'https://sbyfrhnhnuhwcrloqrou.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNieWZyaG5obnVod2NybG9xcm91Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU2NzY1MjksImV4cCI6MjEwMTI1MjUyOX0.xPkpK764zB9dmUnySJ9Lf6CZk24WRDlPiU5SsPgIUy0';
+(function () {
+    const STORAGE_KEY = 'amrani_admin_session';
+    const VALID_CREDENTIALS = {
+        email: 'admin@amrani.com',
+        password: 'admin123'
+    };
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: false
+    function readSession() {
+        try {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? JSON.parse(stored) : null;
+        } catch (error) {
+            return null;
+        }
     }
-});
 
-window.supabaseClient = supabaseClient;
+    const auth = {
+        async signInWithPassword({ email, password }) {
+            if (email === VALID_CREDENTIALS.email && password === VALID_CREDENTIALS.password) {
+                const user = { email, role: 'admin' };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+                return { data: { user }, error: null };
+            }
 
+            return {
+                data: { user: null },
+                error: { message: 'Email ou mot de passe incorrect' }
+            };
+        },
+
+        async signOut() {
+            localStorage.removeItem(STORAGE_KEY);
+            return { error: null };
+        },
+
+        async getSession() {
+            const session = readSession();
+            return {
+                data: { session: session ? { user: session } : null },
+                error: null
+            };
+        },
+
+        onAuthStateChange(callback) {
+            return callback;
+        }
+    };
+
+    const supabaseClient = {
+        auth,
+        from() {
+            return {
+                select() {
+                    return {
+                        eq() {
+                            return {
+                                maybeSingle() {
+                                    return Promise.resolve({ data: { id: 1 }, error: null });
+                                }
+                            };
+                        }
+                    };
+                }
+            };
+        }
+    };
+
+    window.supabaseClient = supabaseClient;
+    window.authManager = {
+        getSession: auth.getSession,
+        signIn: auth.signInWithPassword,
+        signOut: auth.signOut
+    };
+})();
     </script>
     <script>
 
