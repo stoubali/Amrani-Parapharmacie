@@ -78,10 +78,6 @@ function getFeaturedBadge(product) {
 }
 
 function showNotification(message, type = 'info') {
-    if (window.showNotification) {
-        window.showNotification(type === 'error' ? '⚠️' : type === 'success' ? '✅' : 'ℹ️', message, type);
-        return;
-    }
     alert(message);
 }
 

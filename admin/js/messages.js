@@ -73,11 +73,6 @@ function getRandomColor(name) {
 }
 
 function showNotification(message, type = 'info') {
-    if (window.showNotification) {
-        window.showNotification(type === 'error' ? '⚠️' : type === 'success' ? '✅' : 'ℹ️', message, type);
-        return;
-    }
-
     const toast = document.createElement('div');
     toast.style.cssText = `
         position: fixed;
