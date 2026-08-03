@@ -1,171 +1,269 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Parapharmacie</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Amrani Parapharmacie</title>
+<meta name="description" content="Amrani Parapharmacie — produits de santé, vitamines et soins, livrés avec confiance." />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+<!-- Fonts: Fraunces (display), Manrope (body/latin), El Messiri + Cairo (Arabic) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=El+Messiri:wght@500;600;700&family=Cairo:wght@400;500;600&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="/css/style.css" />
+<!-- Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <header id="siteNavbar"></header>
+<!-- ==================== NAVBAR ==================== -->
+<header class="navbar" id="navbar">
+    <div class="navbar-inner">
+        <a href="#top" class="brand">
+            <span class="brand-mark" id="brandLogoWrap"><i class="fas fa-mortar-pestle"></i></span>
+            <span class="brand-name" id="brandName">Amrani Parapharmacie</span>
+        </a>
 
-  <!-- ==================== HERO ==================== -->
-  <section class="hero">
-    <div class="container hero-inner">
-      <div>
-        <div class="hero-status">
-          <span class="dot"></span>
-          <span id="heroHours">Loading hours…</span>
+        <nav class="nav-links" id="navLinks">
+            <a href="#categories">Catégories</a>
+            <a href="#products">Produits</a>
+            <a href="#promotions">Promotions</a>
+            <a href="#about">À propos</a>
+            <a href="#contact">Contact</a>
+        </nav>
+
+        <div class="navbar-actions">
+            <a class="btn btn-ghost" id="navWhatsapp" href="#" target="_blank" rel="noopener">
+                <i class="fab fa-whatsapp"></i><span>WhatsApp</span>
+            </a>
+            <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
-        <h1 id="heroTitleFr">&nbsp;</h1>
-        <p class="hero-desc" id="heroDescFr">&nbsp;</p>
-        <div class="hero-actions">
-          <a href="products.html" class="btn btn-primary"><i class="fas fa-capsules"></i> Browse Products</a>
-          <a href="#contact" class="btn btn-outline"><i class="fas fa-envelope"></i> Get in Touch</a>
+    </div>
+</header>
+
+<!-- ==================== HERO ==================== -->
+<section class="hero" id="top">
+    <div class="hero-rule" aria-hidden="true"></div>
+    <div class="hero-inner">
+        <div class="hero-copy">
+            <span class="eyebrow">Ordonnance de confiance depuis toujours</span>
+            <h1 id="heroTitleFr">Bienvenue à la Parapharmacie Amrani</h1>
+            <h2 class="hero-ar" id="heroTitleAr" dir="rtl" lang="ar">مرحباً بكم في صيدلية العمري</h2>
+            <p class="hero-desc" id="heroDescFr">Votre santé est notre priorité.</p>
+            <p class="hero-desc hero-desc-ar" id="heroDescAr" dir="rtl" lang="ar">صحتكم هي أولويتنا.</p>
+            <div class="hero-cta">
+                <a href="#products" class="btn btn-primary"><i class="fas fa-capsules"></i> Voir les produits</a>
+                <a href="#contact" class="btn btn-outline"><i class="fas fa-comment-medical"></i> Nous contacter</a>
+            </div>
         </div>
-      </div>
-      <div class="hero-visual">
-        <div class="hero-seal">
-          <div class="hero-seal-logo" id="heroLogo">
-            <i class="fas fa-plus-circle"></i>
-          </div>
+        <div class="hero-figure" aria-hidden="true">
+            <svg viewBox="0 0 320 320" class="hero-svg">
+                <circle cx="160" cy="160" r="150" class="hero-ring" />
+                <g class="hero-mortar">
+                    <path d="M95 190 Q160 260 225 190 L235 205 Q160 275 85 205 Z" class="mortar-base"/>
+                    <path d="M100 188 Q160 155 220 188" class="mortar-lip"/>
+                    <line x1="150" y1="95" x2="200" y2="150" class="pestle"/>
+                    <circle cx="150" cy="95" r="9" class="pestle-tip"/>
+                </g>
+                <g class="hero-leaves">
+                    <path d="M60 120 C40 100 40 70 65 55 C75 85 75 105 60 120Z" class="leaf"/>
+                    <path d="M260 120 C280 100 280 70 255 55 C245 85 245 105 260 120Z" class="leaf"/>
+                </g>
+            </svg>
         </div>
-      </div>
     </div>
-  </section>
+</section>
 
-  <!-- ==================== CATEGORIES ==================== -->
-  <section id="categories">
-    <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">What we carry</span>
-        <h2>Shop by category</h2>
-        <p>Everything organized, so you find what you need in seconds.</p>
-      </div>
-      <div class="categories-rail" id="categoriesRail">
-        <p class="empty-note">Loading categories…</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==================== FEATURED PRODUCTS ==================== -->
-  <section style="background: var(--white);">
-    <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">Handpicked</span>
-        <h2>Featured products</h2>
-        <p>A selection our pharmacists recommend most often.</p>
-      </div>
-      <div class="products-grid" id="featuredProductsGrid">
-        <p class="empty-note">Loading products…</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==================== PROMOTIONS ==================== -->
-  <section id="promotions">
-    <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">Current offers</span>
-        <h2>Promotions</h2>
-        <p>Active deals, updated directly by our team.</p>
-      </div>
-      <div class="promotions-strip" id="promotionsStrip">
-        <p class="empty-note">Loading promotions…</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==================== ABOUT ==================== -->
-  <section class="about-section" id="about">
-    <div class="container about-grid">
-      <div class="about-copy">
-        <span class="eyebrow">About us</span>
-        <h2 style="font-family: var(--font-display); font-size: clamp(26px, 3vw, 34px); color: var(--gray-900); margin-bottom: 16px;">
-          Care that goes beyond the counter
-        </h2>
-        <p id="aboutDescFr">Loading…</p>
-        <p id="aboutDescAr" dir="rtl"></p>
-
-        <div class="stat-row">
-          <div class="stat-block">
-            <div class="stat-number" id="statProducts">-</div>
-            <div class="stat-label">Products</div>
-          </div>
-          <div class="stat-block">
-            <div class="stat-number" id="statCategories">-</div>
-            <div class="stat-label">Categories</div>
-          </div>
-          <div class="stat-block">
-            <div class="stat-number" id="statPromotions">-</div>
-            <div class="stat-label">Active Offers</div>
-          </div>
+<!-- ==================== CATEGORIES ==================== -->
+<section class="section" id="categories">
+    <div class="section-inner">
+        <div class="section-head">
+            <span class="eyebrow">Rayons</span>
+            <h2>Catégories</h2>
         </div>
-      </div>
-
-      <div class="about-panel">
-        <ul>
-          <li><i class="fas fa-check-circle"></i> Licensed pharmacists available for consultation</li>
-          <li><i class="fas fa-check-circle"></i> Wide range of medications, vitamins &amp; cosmetics</li>
-          <li><i class="fas fa-check-circle"></i> Fast, friendly service every day of the week</li>
-          <li><i class="fas fa-check-circle"></i> Direct WhatsApp line for quick questions</li>
-        </ul>
-      </div>
+        <div class="tick-divider" aria-hidden="true"></div>
+        <div class="categories-grid" id="categoriesGrid">
+            <div class="skeleton-row">
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+            </div>
+        </div>
     </div>
-  </section>
+</section>
 
-  <!-- ==================== CONTACT ==================== -->
-  <section id="contact">
-    <div class="container contact-grid">
-      <div class="contact-info-card">
-        <h3 id="contactTitle">Get in touch</h3>
-        <p>We usually reply within the day.</p>
-        <ul class="contact-info-list" id="contactInfoList">
-          <li>Loading contact details…</li>
-        </ul>
-      </div>
+<!-- ==================== PROMOTIONS ==================== -->
+<section class="section section-alt" id="promotions">
+    <div class="section-inner">
+        <div class="section-head">
+            <span class="eyebrow">En ce moment</span>
+            <h2>Promotions</h2>
+        </div>
+        <div class="tick-divider" aria-hidden="true"></div>
+        <div class="promotions-grid" id="promotionsGrid">
+            <div class="skeleton skeleton-banner"></div>
+        </div>
+    </div>
+</section>
 
-      <div class="contact-form">
-        <form id="contactForm" novalidate>
-          <div class="form-row-2">
+<!-- ==================== PRODUCTS ==================== -->
+<section class="section" id="products">
+    <div class="section-inner">
+        <div class="section-head">
+            <span class="eyebrow">Notre sélection</span>
+            <h2>Produits</h2>
+        </div>
+        <div class="tick-divider" aria-hidden="true"></div>
+
+        <div class="products-toolbar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="productSearch" placeholder="Rechercher un produit, une marque..." />
+            </div>
+            <div class="filter-chips" id="categoryFilterChips">
+                <button class="chip active" data-category="all">Tous</button>
+            </div>
+        </div>
+
+        <div class="products-grid" id="productsGrid">
+            <div class="skeleton-row">
+                <div class="skeleton skeleton-product"></div>
+                <div class="skeleton skeleton-product"></div>
+                <div class="skeleton skeleton-product"></div>
+                <div class="skeleton skeleton-product"></div>
+            </div>
+        </div>
+
+        <p class="empty-note" id="productsEmpty" hidden>Aucun produit ne correspond à votre recherche.</p>
+    </div>
+</section>
+
+<!-- ==================== ABOUT ==================== -->
+<section class="section section-alt" id="about">
+    <div class="section-inner about-inner">
+        <div class="about-copy">
+            <span class="eyebrow">Notre engagement</span>
+            <h2>Le conseil d'un pharmacien, la proximité d'un quartier</h2>
+            <p>
+                Amrani Parapharmacie accompagne les familles au quotidien : médicaments,
+                vitamines, soins du corps et hygiène, sélectionnés avec le même soin
+                qu'une ordonnance. Notre équipe reste joignable pour répondre à vos
+                questions, en français comme en arabe.
+            </p>
+            <ul class="about-points">
+                <li><i class="fas fa-mortar-pestle"></i> Produits vérifiés et disponibles en stock</li>
+                <li><i class="fas fa-comments"></i> Conseils personnalisés par message ou WhatsApp</li>
+                <li><i class="fas fa-clock"></i> Horaires affichés en temps réel</li>
+            </ul>
+        </div>
+        <div class="about-card" id="hoursCard">
+            <div class="about-card-head"><i class="fas fa-clock"></i> Horaires d'ouverture</div>
+            <p class="about-card-value" id="openingHoursText">—</p>
+            <div class="about-card-head"><i class="fas fa-location-dot"></i> Adresse</div>
+            <p class="about-card-value" id="addressText">—</p>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== CONTACT ==================== -->
+<section class="section" id="contact">
+    <div class="section-inner contact-inner">
+        <div class="contact-info">
+            <span class="eyebrow">Une question ?</span>
+            <h2>Contactez-nous</h2>
+            <p class="contact-lead">Notre équipe vous répond rapidement, du lundi au samedi.</p>
+
+            <div class="contact-list">
+                <a class="contact-row" id="contactPhone" href="tel:">
+                    <span class="contact-icon"><i class="fas fa-phone"></i></span>
+                    <span>
+                        <strong>Téléphone</strong>
+                        <span id="contactPhoneText">—</span>
+                    </span>
+                </a>
+                <a class="contact-row" id="contactWhatsapp" href="#" target="_blank" rel="noopener">
+                    <span class="contact-icon"><i class="fab fa-whatsapp"></i></span>
+                    <span>
+                        <strong>WhatsApp</strong>
+                        <span id="contactWhatsappText">—</span>
+                    </span>
+                </a>
+                <a class="contact-row" id="contactInstagram" href="#" target="_blank" rel="noopener">
+                    <span class="contact-icon"><i class="fab fa-instagram"></i></span>
+                    <span>
+                        <strong>Instagram</strong>
+                        <span id="contactInstagramText">—</span>
+                    </span>
+                </a>
+                <div class="contact-row">
+                    <span class="contact-icon"><i class="fas fa-location-dot"></i></span>
+                    <span>
+                        <strong>Adresse</strong>
+                        <span id="contactAddressText">—</span>
+                    </span>
+                </div>
+                <div class="contact-row">
+                    <span class="contact-icon"><i class="fas fa-clock"></i></span>
+                    <span>
+                        <strong>Horaires</strong>
+                        <span id="contactHoursText">—</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <form class="contact-form" id="contactForm" novalidate>
+            <h3>Envoyer un message</h3>
             <div class="form-field">
-              <label for="cfName">Name <span style="color:var(--accent)">*</span></label>
-              <input type="text" id="cfName" required />
+                <label for="cfName">Nom complet <span class="req">*</span></label>
+                <input type="text" id="cfName" placeholder="Votre nom" required />
             </div>
             <div class="form-field">
-              <label for="cfEmail">Email</label>
-              <input type="email" id="cfEmail" />
+                <label for="cfEmail">Email <span class="req">*</span></label>
+                <input type="email" id="cfEmail" placeholder="vous@email.com" required />
             </div>
-          </div>
-          <div class="form-field">
-            <label for="cfPhone">Phone</label>
-            <input type="text" id="cfPhone" />
-          </div>
-          <div class="form-field">
-            <label for="cfMessage">Message <span style="color:var(--accent)">*</span></label>
-            <textarea id="cfMessage" required></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary" id="cfSubmit" style="width:100%; justify-content:center;">
-            <i class="fas fa-paper-plane"></i> Send Message
-          </button>
+            <div class="form-field">
+                <label for="cfPhone">Téléphone</label>
+                <input type="tel" id="cfPhone" placeholder="06 12 34 56 78" />
+            </div>
+            <div class="form-field">
+                <label for="cfMessage">Message <span class="req">*</span></label>
+                <textarea id="cfMessage" rows="4" placeholder="Comment pouvons-nous vous aider ?" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" id="cfSubmit">
+                <i class="fas fa-paper-plane"></i> <span>Envoyer le message</span>
+            </button>
+            <p class="form-note" id="cfNote" hidden></p>
         </form>
-      </div>
     </div>
-  </section>
+</section>
 
-  <footer id="siteFooter"></footer>
+<!-- ==================== FOOTER ==================== -->
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <span class="brand-mark small"><i class="fas fa-mortar-pestle"></i></span>
+            <span id="footerBrandName">Amrani Parapharmacie</span>
+        </div>
+        <p class="footer-note">© <span id="footerYear"></span> Amrani Parapharmacie. Tous droits réservés.</p>
+        <div class="footer-links">
+            <a href="#categories">Catégories</a>
+            <a href="#products">Produits</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </div>
+</footer>
 
-  <!-- ==================== JAVASCRIPT ==================== -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-client.js"></script>
-  <script src="js/common.js"></script>
-  <script src="js/home.js"></script>
+<!-- ==================== TOAST ==================== -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- ==================== SCRIPTS ==================== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
 </body>
 </html>
