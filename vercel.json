@@ -22,11 +22,7 @@
             "dest": "/public/js/$1"
         },
         {
-            "src": "/admin",
-            "dest": "/admin/index.html"
-        },
-        {
-            "src": "/admin/",
+            "src": "/admin/?$",
             "dest": "/admin/index.html"
         },
         {
