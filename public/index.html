@@ -1,269 +1,1162 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Amrani Parapharmacie</title>
-<meta name="description" content="Amrani Parapharmacie — produits de santé, vitamines et soins, livrés avec confiance." />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Amrani Parapharmacie</title>
+  <!-- Google Font: Inter (premium, clean) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+  <!-- Font Awesome 6 (free icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    /* === style.css (embedded for single-file delivery) === */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #ffffff;
+      color: #1e2a3a;
+      line-height: 1.5;
+      scroll-behavior: smooth;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    ul {
+      list-style: none;
+    }
+    img {
+      max-width: 100%;
+      display: block;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    /* buttons & cta */
+    .btn-primary {
+      display: inline-block;
+      background: #2a7a4b;
+      color: white;
+      font-weight: 600;
+      padding: 12px 32px;
+      border-radius: 60px;
+      transition: 0.25s ease;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(42, 122, 75, 0.2);
+    }
+    .btn-primary:hover {
+      background: #1e5f3a;
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(42, 122, 75, 0.3);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid #2a7a4b;
+      color: #2a7a4b;
+      padding: 10px 28px;
+      border-radius: 60px;
+      font-weight: 600;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .btn-outline:hover {
+      background: #2a7a4b;
+      color: white;
+    }
+    /* ===== NAVBAR ===== */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+      padding: 14px 0;
+      transition: 0.2s;
+    }
+    .navbar .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .logo-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: #2a7a4b;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 22px;
+    }
+    .logo-text {
+      font-weight: 700;
+      font-size: 1.4rem;
+      letter-spacing: -0.5px;
+      color: #1e2a3a;
+    }
+    .logo-text span {
+      color: #2a7a4b;
+    }
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      font-weight: 500;
+    }
+    .nav-links a {
+      transition: 0.2s;
+      font-size: 0.95rem;
+    }
+    .nav-links a:hover {
+      color: #2a7a4b;
+    }
+    .hamburger {
+      display: none;
+      font-size: 1.7rem;
+      cursor: pointer;
+      color: #1e2a3a;
+    }
+    /* mobile */
+    @media (max-width: 900px) {
+      .nav-links {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        gap: 12px;
+        padding: 20px 0 8px;
+        border-top: 1px solid rgba(0,0,0,0.04);
+      }
+      .nav-links.open {
+        display: flex;
+      }
+      .hamburger {
+        display: block;
+      }
+    }
+    /* ===== HERO ===== */
+    .hero {
+      padding: 60px 0 70px;
+      background: #f9fbfa;
+      border-radius: 0 0 40px 40px;
+      margin-bottom: 20px;
+    }
+    .hero-grid {
+      display: flex;
+      align-items: center;
+      gap: 50px;
+      flex-wrap: wrap;
+    }
+    .hero-content {
+      flex: 1 1 380px;
+    }
+    .hero-badge {
+      background: #e3f0e8;
+      color: #1e5f3a;
+      padding: 4px 16px;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      display: inline-block;
+      margin-bottom: 14px;
+    }
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.2;
+      margin-bottom: 16px;
+      color: #0f1a26;
+    }
+    .hero h1 i {
+      color: #2a7a4b;
+    }
+    .hero p {
+      font-size: 1.15rem;
+      color: #3d4e62;
+      max-width: 480px;
+      margin-bottom: 28px;
+    }
+    .hero-image {
+      flex: 1 1 300px;
+      background: #e3ece6;
+      border-radius: 40px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 20px 40px -12px rgba(0,0,0,0.08);
+    }
+    .hero-image i {
+      font-size: 8rem;
+      color: #2a7a4b;
+      opacity: 0.5;
+    }
+    /* placeholder logo inside hero */
+    .pharmacy-logo-placeholder {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .pharmacy-logo-placeholder .logo-icon {
+      width: 56px;
+      height: 56px;
+      font-size: 28px;
+    }
+    .pharmacy-logo-placeholder span {
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+    /* ===== SECTION TITLE ===== */
+    .section-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 32px;
+      letter-spacing: -0.5px;
+    }
+    .section-title span {
+      color: #2a7a4b;
+    }
+    /* ===== CATEGORIES ===== */
+    .categories {
+      padding: 60px 0 40px;
+    }
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 24px;
+    }
+    .category-card {
+      background: #f7f9f8;
+      border-radius: 28px;
+      padding: 22px 10px;
+      text-align: center;
+      transition: 0.25s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+      cursor: default;
+    }
+    .category-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 30px -8px rgba(0,0,0,0.06);
+      background: white;
+    }
+    .category-card i {
+      font-size: 2.4rem;
+      color: #2a7a4b;
+      margin-bottom: 8px;
+    }
+    .category-card h4 {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    /* ===== PRODUCTS ===== */
+    .products {
+      padding: 30px 0 60px;
+      background: #f9fbfa;
+      border-radius: 40px;
+      margin: 20px 0;
+    }
+    .products .container {
+      padding: 0 24px;
+    }
+    .product-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px 24px;
+      margin-bottom: 32px;
+      align-items: center;
+    }
+    .product-toolbar input, .product-toolbar select {
+      padding: 12px 18px;
+      border-radius: 60px;
+      border: 1px solid #e2e8ef;
+      background: white;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      flex: 1 1 200px;
+      outline: none;
+      transition: 0.15s;
+    }
+    .product-toolbar input:focus, .product-toolbar select:focus {
+      border-color: #2a7a4b;
+      box-shadow: 0 0 0 4px rgba(42,122,75,0.08);
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 28px;
+    }
+    .product-card {
+      background: white;
+      border-radius: 28px;
+      padding: 18px 16px 20px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.02);
+      transition: 0.25s ease;
+      border: 1px solid rgba(0,0,0,0.02);
+    }
+    .product-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 36px -12px rgba(0,0,0,0.08);
+    }
+    .product-img {
+      background: #f0f4f2;
+      border-radius: 20px;
+      height: 130px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      color: #2a7a4b;
+      font-size: 2.8rem;
+    }
+    .product-card h5 {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    .product-card .brand {
+      font-size: 0.8rem;
+      color: #6a7b8a;
+    }
+    .product-card .price {
+      font-weight: 700;
+      color: #1e2a3a;
+      margin: 6px 0 4px;
+    }
+    .badge {
+      display: inline-block;
+      background: #e3f0e8;
+      color: #1e5f3a;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 14px;
+      border-radius: 60px;
+    }
+    .badge.out {
+      background: #f3e8e8;
+      color: #a03a3a;
+    }
+    /* ===== PROMOTIONS ===== */
+    .promotions {
+      padding: 50px 0;
+    }
+    .promo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+      gap: 28px;
+    }
+    .promo-card {
+      background: #1e2a3a;
+      color: white;
+      border-radius: 32px;
+      padding: 28px 24px;
+      background: linear-gradient(145deg, #1e2a3a, #15212e);
+      box-shadow: 0 16px 30px -8px rgba(0,0,0,0.2);
+    }
+    .promo-card.green {
+      background: linear-gradient(145deg, #2a7a4b, #1d5f39);
+    }
+    .promo-card h3 {
+      font-weight: 600;
+      font-size: 1.4rem;
+    }
+    .promo-card p {
+      opacity: 0.8;
+      margin: 8px 0 16px;
+    }
+    /* ===== ABOUT ===== */
+    .about {
+      padding: 60px 0;
+      background: #f7f9f8;
+      border-radius: 40px;
+      margin: 20px 0;
+    }
+    .about p {
+      max-width: 700px;
+      color: #2c3e4f;
+      font-size: 1.05rem;
+    }
+    /* ===== CONTACT ===== */
+    .contact {
+      padding: 60px 0;
+    }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+    }
+    @media (max-width: 720px) {
+      .contact-grid { grid-template-columns: 1fr; }
+    }
+    .contact-info p {
+      margin: 8px 0;
+    }
+    .contact-info i {
+      width: 28px;
+      color: #2a7a4b;
+    }
+    .contact-form input, .contact-form textarea {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 20px;
+      border: 1px solid #e2e8ef;
+      font-family: 'Inter', sans-serif;
+      margin-bottom: 16px;
+      transition: 0.15s;
+    }
+    .contact-form input:focus, .contact-form textarea:focus {
+      border-color: #2a7a4b;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(42,122,75,0.06);
+    }
+    .contact-form button {
+      width: 100%;
+    }
+    /* ===== FOOTER ===== */
+    .footer {
+      background: #0f1a26;
+      color: #cbd8e3;
+      padding: 40px 0 24px;
+      border-radius: 40px 40px 0 0;
+      margin-top: 30px;
+    }
+    .footer .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 30px;
+    }
+    .footer-col h5 {
+      color: white;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .footer-col a {
+      display: block;
+      margin: 6px 0;
+      opacity: 0.7;
+      transition: 0.2s;
+    }
+    .footer-col a:hover { opacity: 1; color: white; }
+    .footer-bottom {
+      border-top: 1px solid #1e2f3e;
+      padding-top: 20px;
+      margin-top: 24px;
+      text-align: center;
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+    /* back to top */
+    .back-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #2a7a4b;
+      color: white;
+      width: 48px;
+      height: 48px;
+      border-radius: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      opacity: 0;
+      pointer-events: none;
+      transition: 0.3s;
+      border: none;
+      cursor: pointer;
+    }
+    .back-top.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    /* utilities */
+    .text-muted { color: #5b6f80; }
+    .mt-2 { margin-top: 12px; }
+    .mb-2 { margin-bottom: 12px; }
 
-<!-- Fonts: Fraunces (display), Manrope (body/latin), El Messiri + Cairo (Arabic) -->
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=El+Messiri:wght@500;600;700&family=Cairo:wght@400;500;600&display=swap" rel="stylesheet" />
-
-<!-- Icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-
-<link rel="stylesheet" href="style.css" />
+    /* ===== SUPABASE-DRIVEN IMAGE SUPPORT ===== */
+    .category-card img,
+    .product-img img,
+    .promo-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .category-card .cat-visual {
+      width: 100%;
+      height: 64px;
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+      background: #eef3f0;
+    }
+    .category-card .cat-visual i {
+      margin-bottom: 0;
+    }
+    .category-card .name-ar {
+      display: block;
+      font-size: 0.78rem;
+      color: #6a7b8a;
+      font-weight: 400;
+      margin-top: 2px;
+    }
+    .product-card { position: relative; display: flex; flex-direction: column; }
+    .product-card .name-ar {
+      display: block;
+      font-size: 0.78rem;
+      color: #6a7b8a;
+      font-weight: 400;
+      margin-bottom: 2px;
+    }
+    .product-card .featured-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: #f5a524;
+      color: #2a1c00;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 60px;
+      z-index: 2;
+    }
+    .promo-thumb {
+      width: 100%;
+      height: 110px;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 14px;
+      background: rgba(255,255,255,0.1);
+    }
+    .promo-ar {
+      display: block;
+      font-size: 0.9rem;
+      opacity: 0.75;
+      margin-top: 2px;
+    }
+    .hero-desc-ar { max-width: 480px; color: #3d4e62; margin-bottom: 12px; }
+    .state-note {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 30px;
+      color: #6a7b8a;
+    }
+    .contact-info p a { color: inherit; }
+    .contact-info p a:hover { color: #2a7a4b; }
+  </style>
 </head>
 <body>
-
-<!-- ==================== NAVBAR ==================== -->
-<header class="navbar" id="navbar">
-    <div class="navbar-inner">
-        <a href="#top" class="brand">
-            <span class="brand-mark" id="brandLogoWrap"><i class="fas fa-mortar-pestle"></i></span>
-            <span class="brand-name" id="brandName">Amrani Parapharmacie</span>
-        </a>
-
-        <nav class="nav-links" id="navLinks">
-            <a href="#categories">Catégories</a>
-            <a href="#products">Produits</a>
-            <a href="#promotions">Promotions</a>
-            <a href="#about">À propos</a>
-            <a href="#contact">Contact</a>
-        </nav>
-
-        <div class="navbar-actions">
-            <a class="btn btn-ghost" id="navWhatsapp" href="#" target="_blank" rel="noopener">
-                <i class="fab fa-whatsapp"></i><span>WhatsApp</span>
-            </a>
-            <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <div class="logo-wrapper">
+        <div class="logo-icon" id="navLogoIcon"><i class="fas fa-prescription-bottle"></i></div>
+        <span class="logo-text" id="navBrandName">Amrani <span>Parapharmacie</span></span>
+      </div>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#categories">Categories</a></li>
+        <li><a href="#products">Products</a></li>
+        <li><a href="#promotions">Promotions</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <div class="hamburger" id="hamburger" aria-label="toggle menu">
+        <i class="fas fa-bars"></i>
+      </div>
     </div>
-</header>
+  </nav>
 
-<!-- ==================== HERO ==================== -->
-<section class="hero" id="top">
-    <div class="hero-rule" aria-hidden="true"></div>
-    <div class="hero-inner">
-        <div class="hero-copy">
-            <span class="eyebrow">Ordonnance de confiance depuis toujours</span>
-            <h1 id="heroTitleFr">Bienvenue à la Parapharmacie Amrani</h1>
-            <h2 class="hero-ar" id="heroTitleAr" dir="rtl" lang="ar">مرحباً بكم في صيدلية العمري</h2>
-            <p class="hero-desc" id="heroDescFr">Votre santé est notre priorité.</p>
-            <p class="hero-desc hero-desc-ar" id="heroDescAr" dir="rtl" lang="ar">صحتكم هي أولويتنا.</p>
-            <div class="hero-cta">
-                <a href="#products" class="btn btn-primary"><i class="fas fa-capsules"></i> Voir les produits</a>
-                <a href="#contact" class="btn btn-outline"><i class="fas fa-comment-medical"></i> Nous contacter</a>
-            </div>
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="home">
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <div class="pharmacy-logo-placeholder">
+          <div class="logo-icon" id="heroLogoIcon"><i class="fas fa-prescription-bottle"></i></div>
+          <span id="heroBrandName">Amrani Parapharmacie</span>
         </div>
-        <div class="hero-figure" aria-hidden="true">
-            <svg viewBox="0 0 320 320" class="hero-svg">
-                <circle cx="160" cy="160" r="150" class="hero-ring" />
-                <g class="hero-mortar">
-                    <path d="M95 190 Q160 260 225 190 L235 205 Q160 275 85 205 Z" class="mortar-base"/>
-                    <path d="M100 188 Q160 155 220 188" class="mortar-lip"/>
-                    <line x1="150" y1="95" x2="200" y2="150" class="pestle"/>
-                    <circle cx="150" cy="95" r="9" class="pestle-tip"/>
-                </g>
-                <g class="hero-leaves">
-                    <path d="M60 120 C40 100 40 70 65 55 C75 85 75 105 60 120Z" class="leaf"/>
-                    <path d="M260 120 C280 100 280 70 255 55 C245 85 245 105 260 120Z" class="leaf"/>
-                </g>
-            </svg>
-        </div>
+        <div class="hero-badge"><i class="fas fa-leaf"></i> Bien-être & confiance</div>
+        <h1 id="heroTitleFr">Votre santé, <br/><i>notre priorité</i></h1>
+        <p class="hero-desc-ar" id="heroTitleAr" dir="rtl" lang="ar"></p>
+        <p id="heroDescFr">Des produits de parapharmacie sélectionnés avec soin pour vous et votre famille. Conseil personnalisé et qualité premium.</p>
+        <p class="hero-desc-ar" id="heroDescAr" dir="rtl" lang="ar"></p>
+        <a href="#products" class="btn-primary">Découvrir <i class="fas fa-arrow-right" style="margin-left:8px;"></i></a>
+      </div>
+      <div class="hero-image">
+        <i class="fas fa-hand-holding-heart"></i>
+        <p style="margin-top:12px; color:#1e2a3a; font-weight:500;">Logo / visuel placeholder</p>
+      </div>
     </div>
-</section>
+  </section>
 
-<!-- ==================== CATEGORIES ==================== -->
-<section class="section" id="categories">
-    <div class="section-inner">
-        <div class="section-head">
-            <span class="eyebrow">Rayons</span>
-            <h2>Catégories</h2>
-        </div>
-        <div class="tick-divider" aria-hidden="true"></div>
-        <div class="categories-grid" id="categoriesGrid">
-            <div class="skeleton-row">
-                <div class="skeleton skeleton-card"></div>
-                <div class="skeleton skeleton-card"></div>
-                <div class="skeleton skeleton-card"></div>
-                <div class="skeleton skeleton-card"></div>
-            </div>
-        </div>
+  <!-- ===== CATEGORIES ===== -->
+  <section class="categories" id="categories">
+    <div class="container">
+      <h2 class="section-title">Nos <span>catégories</span></h2>
+      <div class="category-grid" id="categoryGrid">
+        <!-- sample categories injected by js -->
+      </div>
     </div>
-</section>
+  </section>
 
-<!-- ==================== PROMOTIONS ==================== -->
-<section class="section section-alt" id="promotions">
-    <div class="section-inner">
-        <div class="section-head">
-            <span class="eyebrow">En ce moment</span>
-            <h2>Promotions</h2>
-        </div>
-        <div class="tick-divider" aria-hidden="true"></div>
-        <div class="promotions-grid" id="promotionsGrid">
-            <div class="skeleton skeleton-banner"></div>
-        </div>
+  <!-- ===== PRODUCTS ===== -->
+  <section class="products" id="products">
+    <div class="container">
+      <h2 class="section-title">Produits <span>phares</span></h2>
+      <div class="product-toolbar">
+        <input type="text" id="searchInput" placeholder="🔍 Rechercher un produit..." />
+        <select id="categoryFilter"><option value="all">Toutes catégories</option></select>
+      </div>
+      <div class="product-grid" id="productGrid"></div>
     </div>
-</section>
+  </section>
 
-<!-- ==================== PRODUCTS ==================== -->
-<section class="section" id="products">
-    <div class="section-inner">
-        <div class="section-head">
-            <span class="eyebrow">Notre sélection</span>
-            <h2>Produits</h2>
-        </div>
-        <div class="tick-divider" aria-hidden="true"></div>
-
-        <div class="products-toolbar">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="productSearch" placeholder="Rechercher un produit, une marque..." />
-            </div>
-            <div class="filter-chips" id="categoryFilterChips">
-                <button class="chip active" data-category="all">Tous</button>
-            </div>
-        </div>
-
-        <div class="products-grid" id="productsGrid">
-            <div class="skeleton-row">
-                <div class="skeleton skeleton-product"></div>
-                <div class="skeleton skeleton-product"></div>
-                <div class="skeleton skeleton-product"></div>
-                <div class="skeleton skeleton-product"></div>
-            </div>
-        </div>
-
-        <p class="empty-note" id="productsEmpty" hidden>Aucun produit ne correspond à votre recherche.</p>
+  <!-- ===== PROMOTIONS ===== -->
+  <section class="promotions" id="promotions">
+    <div class="container">
+      <h2 class="section-title">Promotions <span>du moment</span></h2>
+      <div class="promo-grid" id="promoGrid"></div>
     </div>
-</section>
+  </section>
 
-<!-- ==================== ABOUT ==================== -->
-<section class="section section-alt" id="about">
-    <div class="section-inner about-inner">
-        <div class="about-copy">
-            <span class="eyebrow">Notre engagement</span>
-            <h2>Le conseil d'un pharmacien, la proximité d'un quartier</h2>
-            <p>
-                Amrani Parapharmacie accompagne les familles au quotidien : médicaments,
-                vitamines, soins du corps et hygiène, sélectionnés avec le même soin
-                qu'une ordonnance. Notre équipe reste joignable pour répondre à vos
-                questions, en français comme en arabe.
-            </p>
-            <ul class="about-points">
-                <li><i class="fas fa-mortar-pestle"></i> Produits vérifiés et disponibles en stock</li>
-                <li><i class="fas fa-comments"></i> Conseils personnalisés par message ou WhatsApp</li>
-                <li><i class="fas fa-clock"></i> Horaires affichés en temps réel</li>
-            </ul>
-        </div>
-        <div class="about-card" id="hoursCard">
-            <div class="about-card-head"><i class="fas fa-clock"></i> Horaires d'ouverture</div>
-            <p class="about-card-value" id="openingHoursText">—</p>
-            <div class="about-card-head"><i class="fas fa-location-dot"></i> Adresse</div>
-            <p class="about-card-value" id="addressText">—</p>
-        </div>
+  <!-- ===== ABOUT ===== -->
+  <section class="about" id="about">
+    <div class="container">
+      <h2 class="section-title">À propos</h2>
+      <p><strong>Amrani Parapharmacie</strong> est une pharmacie de confiance située au cœur du Maroc. Nous offrons une large gamme de produits de parapharmacie, cosmétiques, et bien-être. Notre équipe de professionnels vous accompagne avec des conseils personnalisés pour prendre soin de votre santé au quotidien.</p>
+      <p class="mt-2">Nous sélectionnons les meilleures marques pour vous garantir qualité, efficacité et sécurité. Votre bien-être est notre engagement.</p>
     </div>
-</section>
+  </section>
 
-<!-- ==================== CONTACT ==================== -->
-<section class="section" id="contact">
-    <div class="section-inner contact-inner">
+  <!-- ===== CONTACT ===== -->
+  <section class="contact" id="contact">
+    <div class="container">
+      <h2 class="section-title">Contactez-<span>nous</span></h2>
+      <div class="contact-grid">
         <div class="contact-info">
-            <span class="eyebrow">Une question ?</span>
-            <h2>Contactez-nous</h2>
-            <p class="contact-lead">Notre équipe vous répond rapidement, du lundi au samedi.</p>
-
-            <div class="contact-list">
-                <a class="contact-row" id="contactPhone" href="tel:">
-                    <span class="contact-icon"><i class="fas fa-phone"></i></span>
-                    <span>
-                        <strong>Téléphone</strong>
-                        <span id="contactPhoneText">—</span>
-                    </span>
-                </a>
-                <a class="contact-row" id="contactWhatsapp" href="#" target="_blank" rel="noopener">
-                    <span class="contact-icon"><i class="fab fa-whatsapp"></i></span>
-                    <span>
-                        <strong>WhatsApp</strong>
-                        <span id="contactWhatsappText">—</span>
-                    </span>
-                </a>
-                <a class="contact-row" id="contactInstagram" href="#" target="_blank" rel="noopener">
-                    <span class="contact-icon"><i class="fab fa-instagram"></i></span>
-                    <span>
-                        <strong>Instagram</strong>
-                        <span id="contactInstagramText">—</span>
-                    </span>
-                </a>
-                <div class="contact-row">
-                    <span class="contact-icon"><i class="fas fa-location-dot"></i></span>
-                    <span>
-                        <strong>Adresse</strong>
-                        <span id="contactAddressText">—</span>
-                    </span>
-                </div>
-                <div class="contact-row">
-                    <span class="contact-icon"><i class="fas fa-clock"></i></span>
-                    <span>
-                        <strong>Horaires</strong>
-                        <span id="contactHoursText">—</span>
-                    </span>
-                </div>
-            </div>
+          <p><i class="fas fa-phone-alt"></i> <a href="#" id="contactPhone">Chargement...</a></p>
+          <p><i class="fab fa-whatsapp"></i> <a href="#" id="contactWhatsapp" target="_blank" rel="noopener">Chargement...</a></p>
+          <p><i class="fab fa-instagram"></i> <a href="#" id="contactInstagram" target="_blank" rel="noopener">Chargement...</a></p>
+          <p><i class="fas fa-map-marker-alt"></i> <span id="contactAddress">Chargement...</span></p>
+          <p><i class="fas fa-clock"></i> <span id="contactHours">Chargement...</span></p>
         </div>
-
-        <form class="contact-form" id="contactForm" novalidate>
-            <h3>Envoyer un message</h3>
-            <div class="form-field">
-                <label for="cfName">Nom complet <span class="req">*</span></label>
-                <input type="text" id="cfName" placeholder="Votre nom" required />
-            </div>
-            <div class="form-field">
-                <label for="cfEmail">Email <span class="req">*</span></label>
-                <input type="email" id="cfEmail" placeholder="vous@email.com" required />
-            </div>
-            <div class="form-field">
-                <label for="cfPhone">Téléphone</label>
-                <input type="tel" id="cfPhone" placeholder="06 12 34 56 78" />
-            </div>
-            <div class="form-field">
-                <label for="cfMessage">Message <span class="req">*</span></label>
-                <textarea id="cfMessage" rows="4" placeholder="Comment pouvons-nous vous aider ?" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary btn-block" id="cfSubmit">
-                <i class="fas fa-paper-plane"></i> <span>Envoyer le message</span>
-            </button>
-            <p class="form-note" id="cfNote" hidden></p>
+        <form class="contact-form" id="contactForm">
+          <input type="text" placeholder="Nom complet" id="formName" required />
+          <input type="email" placeholder="Email" id="formEmail" required />
+          <input type="tel" placeholder="Téléphone" id="formPhone" />
+          <textarea rows="3" placeholder="Votre message..." id="formMessage" required></textarea>
+          <button type="submit" class="btn-primary" id="formSubmitBtn">Envoyer <i class="fas fa-paper-plane" style="margin-left:8px;"></i></button>
+          <p id="formFeedback" style="margin-top:8px; font-size:0.9rem;"></p>
         </form>
+      </div>
     </div>
-</section>
+  </section>
 
-<!-- ==================== FOOTER ==================== -->
-<footer class="footer">
-    <div class="footer-inner">
-        <div class="footer-brand">
-            <span class="brand-mark small"><i class="fas fa-mortar-pestle"></i></span>
-            <span id="footerBrandName">Amrani Parapharmacie</span>
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-col">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+          <div class="logo-icon" style="background:#2a7a4b;" id="footerLogoIcon"><i class="fas fa-prescription-bottle"></i></div>
+          <span style="color:white; font-weight:700; font-size:1.2rem;" id="footerBrandName">Amrani Parapharmacie</span>
         </div>
-        <p class="footer-note">© <span id="footerYear"></span> Amrani Parapharmacie. Tous droits réservés.</p>
-        <div class="footer-links">
-            <a href="#categories">Catégories</a>
-            <a href="#products">Produits</a>
-            <a href="#contact">Contact</a>
-        </div>
+        <p style="opacity:0.6; max-width:260px;">Votre parapharmacie de confiance au Maroc.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Navigation</h5>
+        <a href="#home">Home</a>
+        <a href="#categories">Catégories</a>
+        <a href="#products">Produits</a>
+        <a href="#promotions">Promotions</a>
+        <a href="#about">À propos</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contact</h5>
+        <a href="#" id="footerPhone"><i class="fas fa-phone-alt" style="margin-right:8px;"></i> <span>Chargement...</span></a>
+        <a href="#" id="footerWhatsapp" target="_blank" rel="noopener"><i class="fab fa-whatsapp" style="margin-right:8px;"></i> <span>Chargement...</span></a>
+        <a href="#" id="footerInstagram" target="_blank" rel="noopener"><i class="fab fa-instagram" style="margin-right:8px;"></i> <span>Chargement...</span></a>
+      </div>
     </div>
-</footer>
+    <div class="footer-bottom container">
+      &copy; <span id="footerYear">2026</span> <span id="footerBrandName2">Amrani Parapharmacie</span>. Tous droits réservés.
+    </div>
+  </footer>
 
-<!-- ==================== TOAST ==================== -->
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <!-- back to top -->
+  <button class="back-top" id="backTopBtn" aria-label="Retour en haut"><i class="fas fa-chevron-up"></i></button>
 
-<!-- ==================== SCRIPTS ==================== -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="script.js"></script>
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- ================================================== -->
+  <!-- script.js (embedded) — live Supabase data, no mock arrays -->
+  <script>
+    (function() {
+      "use strict";
+
+      // ============================================================
+      // SUPABASE CONFIGURATION — replace these two values only
+      // ============================================================
+      const SUPABASE_URL = "https://YOUR-PROJECT-REF.supabase.co";
+      const SUPABASE_ANON_KEY = "YOUR-SUPABASE-ANON-KEY";
+      // ============================================================
+
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      // ============================================================
+      // STATE
+      // ============================================================
+      const State = {
+        categories: [],
+        products: [],
+        promotions: [],
+        settings: null
+      };
+
+      // ============================================================
+      // HELPERS
+      // ============================================================
+      function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function formatPrice(price) {
+        const value = Number(price);
+        if (Number.isNaN(value)) return '';
+        return value.toFixed(2) + ' DH';
+      }
+
+      function digitsOnly(str) {
+        return (str || '').replace(/[^\d+]/g, '');
+      }
+
+      function getCategoryName(categoryId) {
+        const cat = State.categories.find(c => String(c.id) === String(categoryId));
+        return cat ? cat.name_fr : 'Non catégorisé';
+      }
+
+      // ============================================================
+      // SETTINGS (hero, logo, contact info)
+      // ============================================================
+      async function loadSettings() {
+        try {
+          const { data, error } = await supabase
+            .from('settings')
+            .select('*')
+            .limit(1)
+            .maybeSingle();
+
+          if (error) throw error;
+
+          State.settings = data || {};
+          renderSettings(State.settings);
+        } catch (err) {
+          console.error('Erreur lors du chargement des paramètres :', err);
+          // Static placeholders already in the HTML remain visible as fallback
+        }
+      }
+
+      function renderSettings(settings) {
+        const name = settings.pharmacy_name || 'Amrani Parapharmacie';
+        document.title = name;
+
+        const navBrand = document.getElementById('navBrandName');
+        if (navBrand) navBrand.textContent = name;
+        const footerBrand1 = document.getElementById('footerBrandName');
+        if (footerBrand1) footerBrand1.textContent = name;
+        const footerBrand2 = document.getElementById('footerBrandName2');
+        if (footerBrand2) footerBrand2.textContent = name;
+        const heroBrand = document.getElementById('heroBrandName');
+        if (heroBrand) heroBrand.textContent = name;
+
+        if (settings.logo_url) {
+          const logoHtml = `<img src="${escapeHtml(settings.logo_url)}" alt="${escapeHtml(name)}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-prescription-bottle\\'></i>'" />`;
+          ['navLogoIcon', 'heroLogoIcon', 'footerLogoIcon'].forEach(id => {
+            const elNode = document.getElementById(id);
+            if (elNode) elNode.innerHTML = logoHtml;
+          });
+        }
+
+        if (settings.hero_title_fr) {
+          const heroTitle = document.getElementById('heroTitleFr');
+          if (heroTitle) heroTitle.textContent = settings.hero_title_fr;
+        }
+        if (settings.hero_title_ar) {
+          const heroTitleAr = document.getElementById('heroTitleAr');
+          if (heroTitleAr) heroTitleAr.textContent = settings.hero_title_ar;
+        }
+        if (settings.hero_description_fr) {
+          const heroDesc = document.getElementById('heroDescFr');
+          if (heroDesc) heroDesc.textContent = settings.hero_description_fr;
+        }
+        if (settings.hero_description_ar) {
+          const heroDescAr = document.getElementById('heroDescAr');
+          if (heroDescAr) heroDescAr.textContent = settings.hero_description_ar;
+        }
+
+        const phone = settings.phone || '';
+        const whatsapp = settings.whatsapp || '';
+        const instagram = settings.instagram || '';
+        const address = settings.address || 'Non renseignée';
+        const hours = settings.opening_hours || 'Non renseignées';
+
+        const phoneLinks = ['contactPhone', 'footerPhone'];
+        phoneLinks.forEach(id => {
+          const linkEl = document.getElementById(id);
+          if (!linkEl) return;
+          if (phone) {
+            linkEl.href = `tel:${digitsOnly(phone)}`;
+            const span = linkEl.querySelector('span');
+            if (span) span.textContent = phone; else linkEl.textContent = phone;
+          } else {
+            const span = linkEl.querySelector('span');
+            if (span) span.textContent = 'Non renseigné';
+          }
+        });
+
+        const waLink = whatsapp ? `https://wa.me/${digitsOnly(whatsapp).replace(/^0/, '212')}` : '#';
+        const waLinks = ['contactWhatsapp', 'footerWhatsapp'];
+        waLinks.forEach(id => {
+          const linkEl = document.getElementById(id);
+          if (!linkEl) return;
+          linkEl.href = waLink;
+          const span = linkEl.querySelector('span');
+          const text = whatsapp || 'Non renseigné';
+          if (span) span.textContent = text; else linkEl.textContent = text;
+        });
+
+        const igHandle = instagram
+          ? (instagram.includes('instagram.com')
+              ? '@' + instagram.split('instagram.com/')[1]?.replace(/\/$/, '')
+              : instagram)
+          : 'Non renseigné';
+        const igHref = instagram
+          ? (instagram.startsWith('http') ? instagram : `https://instagram.com/${instagram.replace('@', '')}`)
+          : '#';
+        const igLinks = ['contactInstagram', 'footerInstagram'];
+        igLinks.forEach(id => {
+          const linkEl = document.getElementById(id);
+          if (!linkEl) return;
+          linkEl.href = igHref;
+          const span = linkEl.querySelector('span');
+          if (span) span.textContent = igHandle; else linkEl.textContent = igHandle;
+        });
+
+        const addressEl = document.getElementById('contactAddress');
+        if (addressEl) addressEl.textContent = address;
+        const hoursEl = document.getElementById('contactHours');
+        if (hoursEl) hoursEl.textContent = hours;
+      }
+
+      // ============================================================
+      // CATEGORIES
+      // ============================================================
+      async function loadCategories() {
+        const grid = document.getElementById('categoryGrid');
+        try {
+          const { data, error } = await supabase
+            .from('categories')
+            .select('*')
+            .order('name_fr', { ascending: true });
+
+          if (error) throw error;
+
+          State.categories = data || [];
+          renderCategories();
+          populateCategoryFilter();
+        } catch (err) {
+          console.error('Erreur lors du chargement des catégories :', err);
+          if (grid) grid.innerHTML = `<p class="state-note">Impossible de charger les catégories pour le moment.</p>`;
+        }
+      }
+
+      function renderCategories() {
+        const grid = document.getElementById('categoryGrid');
+        if (!grid) return;
+
+        if (!State.categories.length) {
+          grid.innerHTML = `<p class="state-note">Aucune catégorie disponible pour le moment.</p>`;
+          return;
+        }
+
+        grid.innerHTML = State.categories.map(c => `
+          <div class="category-card" data-category-id="${c.id}">
+            <div class="cat-visual">
+              ${c.image_url
+                ? `<img src="${escapeHtml(c.image_url)}" alt="${escapeHtml(c.name_fr)}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-tag\\'></i>'" />`
+                : `<i class="fas fa-tag"></i>`}
+            </div>
+            <h4>${escapeHtml(c.name_fr)}</h4>
+            <span class="name-ar" dir="rtl" lang="ar">${escapeHtml(c.name_ar || '')}</span>
+          </div>
+        `).join('');
+
+        grid.querySelectorAll('.category-card').forEach(card => {
+          card.style.cursor = 'pointer';
+          card.addEventListener('click', () => {
+            const categoryFilter = document.getElementById('categoryFilter');
+            if (categoryFilter) {
+              categoryFilter.value = card.dataset.categoryId;
+              filterProducts();
+            }
+            document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+          });
+        });
+      }
+
+      function populateCategoryFilter() {
+        const select = document.getElementById('categoryFilter');
+        if (!select) return;
+        select.innerHTML = `<option value="all">Toutes catégories</option>` +
+          State.categories.map(c => `<option value="${c.id}">${escapeHtml(c.name_fr)}</option>`).join('');
+      }
+
+      // ============================================================
+      // PROMOTIONS (active = true only)
+      // ============================================================
+      async function loadPromotions() {
+        const grid = document.getElementById('promoGrid');
+        const section = document.getElementById('promotions');
+        try {
+          const { data, error } = await supabase
+            .from('promotions')
+            .select('*')
+            .eq('active', true)
+            .order('created_at', { ascending: false });
+
+          if (error) throw error;
+
+          State.promotions = data || [];
+          renderPromotions();
+        } catch (err) {
+          console.error('Erreur lors du chargement des promotions :', err);
+          if (grid) grid.innerHTML = `<p class="state-note">Impossible de charger les promotions pour le moment.</p>`;
+        }
+      }
+
+      function renderPromotions() {
+        const grid = document.getElementById('promoGrid');
+        const section = document.getElementById('promotions');
+        if (!grid) return;
+
+        if (!State.promotions.length) {
+          if (section) section.style.display = 'none';
+          return;
+        }
+        if (section) section.style.display = '';
+
+        grid.innerHTML = State.promotions.map((p, i) => `
+          <div class="promo-card ${i % 2 === 0 ? 'green' : ''}">
+            ${p.image_url ? `
+              <div class="promo-thumb">
+                <img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.title_fr)}" onerror="this.parentElement.style.display='none'" />
+              </div>
+            ` : ''}
+            <h3>${escapeHtml(p.title_fr)}</h3>
+            <span class="promo-ar" dir="rtl" lang="ar">${escapeHtml(p.title_ar || '')}</span>
+            ${p.description_fr ? `<p>${escapeHtml(p.description_fr)}</p>` : ''}
+          </div>
+        `).join('');
+      }
+
+      // ============================================================
+      // PRODUCTS (is_available = true only)
+      // ============================================================
+      async function loadProducts() {
+        const grid = document.getElementById('productGrid');
+        try {
+          const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .eq('is_available', true)
+            .order('is_featured', { ascending: false })
+            .order('created_at', { ascending: false });
+
+          if (error) throw error;
+
+          State.products = data || [];
+          renderProducts(State.products);
+        } catch (err) {
+          console.error('Erreur lors du chargement des produits :', err);
+          if (grid) grid.innerHTML = `<p class="state-note">Impossible de charger les produits pour le moment. Veuillez réessayer plus tard.</p>`;
+        }
+      }
+
+      function renderProducts(productsArray) {
+        const grid = document.getElementById('productGrid');
+        if (!grid) return;
+
+        if (!State.products.length) {
+          grid.innerHTML = `<p class="state-note">Aucun produit disponible pour le moment.</p>`;
+          return;
+        }
+
+        if (productsArray.length === 0) {
+          grid.innerHTML = `<p class="state-note">Aucun produit ne correspond à votre recherche.</p>`;
+          return;
+        }
+
+        grid.innerHTML = productsArray.map(p => `
+          <div class="product-card" data-category="${p.category_id}">
+            ${p.is_featured ? `<span class="featured-badge">⭐ Vedette</span>` : ''}
+            <div class="product-img">
+              ${p.image_url
+                ? `<img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.name_fr)}" onerror="this.parentElement.innerHTML='🧪'" />`
+                : '🧪'}
+            </div>
+            <h5>${escapeHtml(p.name_fr)}</h5>
+            <span class="name-ar" dir="rtl" lang="ar">${escapeHtml(p.name_ar || '')}</span>
+            <div class="brand">${escapeHtml(p.brand || '')}</div>
+            <div class="price">${formatPrice(p.price)}</div>
+            <span class="badge">En stock</span>
+          </div>
+        `).join('');
+      }
+
+      // ============================================================
+      // FILTER & SEARCH (client-side, no extra Supabase calls)
+      // ============================================================
+      function filterProducts() {
+        const search = document.getElementById('searchInput')?.value.toLowerCase().trim() || '';
+        const category = document.getElementById('categoryFilter')?.value || 'all';
+
+        const filtered = State.products.filter(p => {
+          const matchName = (p.name_fr || '').toLowerCase().includes(search) ||
+            (p.name_ar || '').toLowerCase().includes(search) ||
+            (p.brand || '').toLowerCase().includes(search);
+          const matchCat = category === 'all' || String(p.category_id) === String(category);
+          return matchName && matchCat;
+        });
+        renderProducts(filtered);
+      }
+
+      // ============================================================
+      // CONTACT FORM — inserts into the "messages" table
+      // ============================================================
+      function setupContactForm() {
+        const form = document.getElementById('contactForm');
+        const feedback = document.getElementById('formFeedback');
+        const submitBtn = document.getElementById('formSubmitBtn');
+        if (!form) return;
+
+        form.addEventListener('submit', async function(e) {
+          e.preventDefault();
+
+          const name = document.getElementById('formName')?.value.trim();
+          const email = document.getElementById('formEmail')?.value.trim();
+          const phone = document.getElementById('formPhone')?.value.trim();
+          const message = document.getElementById('formMessage')?.value.trim();
+
+          if (!name || !email || !message) {
+            feedback.textContent = 'Veuillez remplir tous les champs obligatoires.';
+            feedback.style.color = '#a03a3a';
+            return;
+          }
+          if (!email.includes('@') || !email.includes('.')) {
+            feedback.textContent = 'Veuillez entrer un email valide.';
+            feedback.style.color = '#a03a3a';
+            return;
+          }
+
+          const originalHtml = submitBtn ? submitBtn.innerHTML : '';
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
+          }
+
+          try {
+            const { error } = await supabase
+              .from('messages')
+              .insert([{ name, email, phone, message }]);
+
+            if (error) throw error;
+
+            form.reset();
+            feedback.textContent = '✅ Votre message a été envoyé avec succès. Nous vous répondrons rapidement.';
+            feedback.style.color = '#1e5f3a';
+          } catch (err) {
+            console.error('Erreur lors de l\'envoi du message :', err);
+            feedback.textContent = "❌ Une erreur est survenue. Merci de réessayer dans un instant.";
+            feedback.style.color = '#a03a3a';
+          } finally {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = originalHtml;
+            }
+          }
+        });
+      }
+
+      // ============================================================
+      // NAV, SCROLL, BACK TO TOP
+      // ============================================================
+      function setupMobileNav() {
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+        if (hamburger && navLinks) {
+          hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('open');
+          });
+          // close on link click
+          navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => navLinks.classList.remove('open'));
+          });
+        }
+      }
+
+      function setupBackToTop() {
+        const btn = document.getElementById('backTopBtn');
+        if (!btn) return;
+        window.addEventListener('scroll', () => {
+          if (window.scrollY > 400) btn.classList.add('visible');
+          else btn.classList.remove('visible');
+        });
+        btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+      }
+
+      // ============================================================
+      // INIT
+      // ============================================================
+      document.addEventListener('DOMContentLoaded', function() {
+        loadSettings();
+        loadCategories().then(loadProducts); // products depend on categories for the filter dropdown
+        loadPromotions();
+
+        // search & filter events (client-side against already-loaded products)
+        document.getElementById('searchInput')?.addEventListener('input', filterProducts);
+        document.getElementById('categoryFilter')?.addEventListener('change', filterProducts);
+
+        setupContactForm();
+        setupMobileNav();
+        setupBackToTop();
+      });
+
+    })();
+  </script>
 </body>
 </html>
