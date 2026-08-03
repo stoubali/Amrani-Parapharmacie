@@ -1,40 +1,171 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Amrani Parapharmacie</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background: #f8fafc;
-        color: #0f172a;
-        margin: 0;
-        display: grid;
-        place-items: center;
-        min-height: 100vh;
-      }
-      .card {
-        background: white;
-        padding: 2rem;
-        border-radius: 16px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-        text-align: center;
-      }
-      a {
-        display: inline-block;
-        margin-top: 1rem;
-        color: #16a34a;
-        font-weight: 600;
-        text-decoration: none;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="card">
-      <h1>Parapharmacie Amrani</h1>
-      <p>Bienvenue sur la version déployée du projet.</p>
-      <a href="/admin/dashboard.html">Ouvrir le tableau de bord</a>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parapharmacie</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <header id="siteNavbar"></header>
+
+  <!-- ==================== HERO ==================== -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <div>
+        <div class="hero-status">
+          <span class="dot"></span>
+          <span id="heroHours">Loading hours…</span>
+        </div>
+        <h1 id="heroTitleFr">&nbsp;</h1>
+        <p class="hero-desc" id="heroDescFr">&nbsp;</p>
+        <div class="hero-actions">
+          <a href="products.html" class="btn btn-primary"><i class="fas fa-capsules"></i> Browse Products</a>
+          <a href="#contact" class="btn btn-outline"><i class="fas fa-envelope"></i> Get in Touch</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-seal">
+          <div class="hero-seal-logo" id="heroLogo">
+            <i class="fas fa-plus-circle"></i>
+          </div>
+        </div>
+      </div>
     </div>
-  </body>
+  </section>
+
+  <!-- ==================== CATEGORIES ==================== -->
+  <section id="categories">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">What we carry</span>
+        <h2>Shop by category</h2>
+        <p>Everything organized, so you find what you need in seconds.</p>
+      </div>
+      <div class="categories-rail" id="categoriesRail">
+        <p class="empty-note">Loading categories…</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FEATURED PRODUCTS ==================== -->
+  <section style="background: var(--white);">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Handpicked</span>
+        <h2>Featured products</h2>
+        <p>A selection our pharmacists recommend most often.</p>
+      </div>
+      <div class="products-grid" id="featuredProductsGrid">
+        <p class="empty-note">Loading products…</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PROMOTIONS ==================== -->
+  <section id="promotions">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Current offers</span>
+        <h2>Promotions</h2>
+        <p>Active deals, updated directly by our team.</p>
+      </div>
+      <div class="promotions-strip" id="promotionsStrip">
+        <p class="empty-note">Loading promotions…</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== ABOUT ==================== -->
+  <section class="about-section" id="about">
+    <div class="container about-grid">
+      <div class="about-copy">
+        <span class="eyebrow">About us</span>
+        <h2 style="font-family: var(--font-display); font-size: clamp(26px, 3vw, 34px); color: var(--gray-900); margin-bottom: 16px;">
+          Care that goes beyond the counter
+        </h2>
+        <p id="aboutDescFr">Loading…</p>
+        <p id="aboutDescAr" dir="rtl"></p>
+
+        <div class="stat-row">
+          <div class="stat-block">
+            <div class="stat-number" id="statProducts">-</div>
+            <div class="stat-label">Products</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-number" id="statCategories">-</div>
+            <div class="stat-label">Categories</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-number" id="statPromotions">-</div>
+            <div class="stat-label">Active Offers</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-panel">
+        <ul>
+          <li><i class="fas fa-check-circle"></i> Licensed pharmacists available for consultation</li>
+          <li><i class="fas fa-check-circle"></i> Wide range of medications, vitamins &amp; cosmetics</li>
+          <li><i class="fas fa-check-circle"></i> Fast, friendly service every day of the week</li>
+          <li><i class="fas fa-check-circle"></i> Direct WhatsApp line for quick questions</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CONTACT ==================== -->
+  <section id="contact">
+    <div class="container contact-grid">
+      <div class="contact-info-card">
+        <h3 id="contactTitle">Get in touch</h3>
+        <p>We usually reply within the day.</p>
+        <ul class="contact-info-list" id="contactInfoList">
+          <li>Loading contact details…</li>
+        </ul>
+      </div>
+
+      <div class="contact-form">
+        <form id="contactForm" novalidate>
+          <div class="form-row-2">
+            <div class="form-field">
+              <label for="cfName">Name <span style="color:var(--accent)">*</span></label>
+              <input type="text" id="cfName" required />
+            </div>
+            <div class="form-field">
+              <label for="cfEmail">Email</label>
+              <input type="email" id="cfEmail" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="cfPhone">Phone</label>
+            <input type="text" id="cfPhone" />
+          </div>
+          <div class="form-field">
+            <label for="cfMessage">Message <span style="color:var(--accent)">*</span></label>
+            <textarea id="cfMessage" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" id="cfSubmit" style="width:100%; justify-content:center;">
+            <i class="fas fa-paper-plane"></i> Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer id="siteFooter"></footer>
+
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/home.js"></script>
+</body>
 </html>
