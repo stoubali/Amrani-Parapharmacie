@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Products - Parapharmacie</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+    <header id="siteNavbar"></header>
+
+    <section style="padding: 56px 0 32px;">
+        <div class="container">
+            <div class="section-head" style="margin-bottom: 32px;">
+                <span class="eyebrow">Full catalog</span>
+                <h2>All products</h2>
+                <p>Search or filter by category to find exactly what you need.</p>
+            </div>
+
+            <div class="products-toolbar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search by name, brand..." />
+                </div>
+                <select class="filter-select" id="categoryFilter">
+                    <option value="all">All Categories</option>
+                </select>
+            </div>
+
+            <p id="resultsCount" style="color: var(--gray-400); font-size: 13.5px; margin-bottom: 20px;"></p>
+
+            <div class="products-grid" id="productsGrid">
+                <p class="empty-note">Loading products…</p>
+            </div>
+        </div>
+    </section>
+
+    <footer id="siteFooter"></footer>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/products.js"></script>
+</body>
+</html>
