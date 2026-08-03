@@ -1,41 +1,29 @@
 {
     "version": 2,
-    "rewrites": [
+    "routes": [
         {
-            "source": "/admin",
-            "destination": "/admin/index.html"
+            "src": "/",
+            "dest": "/index.html"
         },
         {
-            "source": "/admin/",
-            "destination": "/admin/index.html"
+            "src": "/landing.html",
+            "dest": "/landing.html"
         },
         {
-            "source": "/admin/(.*)",
-            "destination": "/admin/$1"
+            "src": "/products.html",
+            "dest": "/products.html"
         },
         {
-            "source": "/",
-            "destination": "/public/index.html"
+            "src": "/admin",
+            "dest": "/admin/index.html"
         },
         {
-            "source": "/landing.html",
-            "destination": "/landing.html"
+            "src": "/admin/",
+            "dest": "/admin/index.html"
         },
         {
-            "source": "/products.html",
-            "destination": "/public/products.html"
-        },
-        {
-            "source": "/css/:path*",
-            "destination": "/public/css/:path*"
-        },
-        {
-            "source": "/js/:path*",
-            "destination": "/public/js/:path*"
-        },
-        {
-            "source": "(.*)",
-            "destination": "/public/$1"
+            "src": "/admin/(.*)",
+            "dest": "/admin/$1"
         }
     ]
 }
