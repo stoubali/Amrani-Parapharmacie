@@ -46,7 +46,7 @@
                                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                                 <polyline points="22,6 12,13 2,6"/>
                             </svg>
-                            <input type="email" id="loginEmail" placeholder="admin@amrani.ma" required>
+                            <input type="email" id="loginEmail" placeholder="admin@amrani.ma" required autocomplete="username">
                         </div>
                         <span class="error-msg" id="emailError"></span>
                     </div>
@@ -59,7 +59,7 @@
                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                             </svg>
-                            <input type="password" id="loginPassword" placeholder="••••••••" required>
+                            <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
                             <button type="button" class="password-toggle" id="passwordToggle" aria-label="Afficher/Masquer le mot de passe">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -110,6 +110,19 @@
         </div>
     </div>
 
+    <!-- ========== SUPABASE ========== -->
+    <!-- 1. Supabase JS v2 library (CDN) — must load BEFORE js/login.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+    <!-- 2. Supabase project config — PASTE YOUR URL AND ANON KEY HERE -->
+    <script>
+        // ---- PASTE YOUR SUPABASE CREDENTIALS BELOW ----
+        // Find these in: Supabase Dashboard > Project Settings > API
+        const SUPABASE_URL = 'https://jdzjscecaployngmzfub.supabase.co';   // <-- paste your Project URL
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkempzY2VjYXBsb3luZ216ZnViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU4NDY2NzIsImV4cCI6MjEwMTQyMjY3Mn0.geBp7Tm5Lz-j2guHswp7lYtoPw3mQJYFH4wwxhM7jtM';               // <-- paste your anon/public key
+    </script>
+
+    <!-- 3. Login logic (uses SUPABASE_URL / SUPABASE_ANON_KEY above) -->
     <script src="js/login.js"></script>
 </body>
 </html>

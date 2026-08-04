@@ -1,8 +1,56 @@
 // ====================================================
 // js/login.js — Admin Login for Amrani Parapharmacie
+// Connected to Supabase Authentication
+// ====================================================
+//
+// Requires (loaded in login_admin.html, in this order):
+//   1. https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/.../supabase.min.js
+//   2. A small inline <script> defining SUPABASE_URL and SUPABASE_ANON_KEY
+//   3. This file (js/login.js)
+//
+// Expected database object:
+//   public.admins
+//     id  uuid  primary key  references auth.users(id)
+//   (Add one row per admin user, using their auth.users id.)
 // ====================================================
 
-document.addEventListener('DOMContentLoaded', function() {
+// ---------- SUPABASE CLIENT ----------
+// Holds the single Supabase client instance used across this page.
+let supabaseClient = null;
+
+/**
+ * initializeSupabase()
+ * Creates the Supabase client using the URL/key defined in login_admin.html.
+ * Session persistence + auto token refresh are enabled so that a refresh
+ * (or reopening the tab) keeps the admin logged in.
+ */
+function initializeSupabase() {
+    if (typeof window.supabase === 'undefined') {
+        console.error('Supabase library not loaded. Check the CDN <script> tag in login_admin.html.');
+        return null;
+    }
+
+    if (!SUPABASE_URL || SUPABASE_URL.includes('YOUR-PROJECT-REF') ||
+        !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes('YOUR-ANON-PUBLIC-KEY')) {
+        console.error('Supabase credentials are not set. Paste your URL and anon key in login_admin.html.');
+        return null;
+    }
+
+    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+            persistSession: true,   // keep session across page refreshes
+            autoRefreshToken: true, // silently refresh the access token
+            detectSessionInUrl: true,
+        },
+    });
+
+    return client;
+}
+
+// ====================================================
+// DOM READY
+// ====================================================
+document.addEventListener('DOMContentLoaded', async function () {
     // DOM Elements
     const form = document.getElementById('loginForm');
     const emailInput = document.getElementById('loginEmail');
@@ -17,11 +65,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const passwordToggle = document.getElementById('passwordToggle');
     const rememberMe = document.getElementById('rememberMe');
 
-    // Password visibility toggle
-    passwordToggle.addEventListener('click', function() {
+    // ---------- INIT SUPABASE ----------
+    supabaseClient = initializeSupabase();
+
+    if (!supabaseClient) {
+        showError('Configuration Supabase manquante. Contactez l\'administrateur technique.');
+        setLoading(false, { disable: true });
+        return; // Nothing else can work without a client — stop here.
+    }
+
+    // ---------- CHECK IF ALREADY LOGGED IN ----------
+    // If a valid admin session already exists, skip the form entirely.
+    await checkExistingSession();
+
+    // ---------- PASSWORD VISIBILITY TOGGLE ----------
+    passwordToggle.addEventListener('click', function () {
         const isPassword = passwordInput.getAttribute('type') === 'password';
         passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
-        // Change icon
         const icon = this.querySelector('svg');
         if (isPassword) {
             icon.innerHTML = `
@@ -36,19 +96,62 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Form validation & submission
-    form.addEventListener('submit', function(e) {
+    // ---------- REMEMBER ME (email only — never store passwords) ----------
+    if (localStorage.getItem('rememberMe') === 'true') {
+        rememberMe.checked = true;
+        const savedEmail = localStorage.getItem('savedEmail');
+        if (savedEmail) emailInput.value = savedEmail;
+    }
+
+    rememberMe.addEventListener('change', function () {
+        if (this.checked) {
+            localStorage.setItem('rememberMe', 'true');
+            localStorage.setItem('savedEmail', emailInput.value);
+        } else {
+            localStorage.removeItem('rememberMe');
+            localStorage.removeItem('savedEmail');
+        }
+    });
+
+    // ---------- REAL-TIME FIELD VALIDATION ----------
+    emailInput.addEventListener('blur', function () {
+        const email = this.value.trim();
+        emailError.textContent = (email && !isValidEmail(email))
+            ? 'Veuillez entrer un email valide'
+            : '';
+    });
+
+    passwordInput.addEventListener('blur', function () {
+        const password = this.value.trim();
+        passwordError.textContent = (password && password.length < 6)
+            ? 'Le mot de passe doit contenir au moins 6 caractères'
+            : '';
+    });
+
+    emailInput.addEventListener('input', function () {
+        emailError.textContent = '';
+        hideError();
+    });
+
+    passwordInput.addEventListener('input', function () {
+        passwordError.textContent = '';
+        hideError();
+    });
+
+    // ---------- FORM SUBMIT ----------
+    form.addEventListener('submit', async function (e) {
         e.preventDefault();
-        
-        // Reset errors
-        clearErrors();
-        hideLoginError();
 
-        // Validate
+        // Reset previous errors
+        emailError.textContent = '';
+        passwordError.textContent = '';
+        hideError();
+
+        // ---- Client-side validation ----
         let isValid = true;
-
-        // Email validation
         const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
+
         if (!email) {
             emailError.textContent = 'L\'email est requis';
             isValid = false;
@@ -57,8 +160,6 @@ document.addEventListener('DOMContentLoaded', function() {
             isValid = false;
         }
 
-        // Password validation
-        const password = passwordInput.value.trim();
         if (!password) {
             passwordError.textContent = 'Le mot de passe est requis';
             isValid = false;
@@ -69,69 +170,175 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (!isValid) return;
 
-        // Show loading state
-        setLoading(true);
+        // Remember-me: persist/clear the saved email right away
+        if (rememberMe.checked) {
+            localStorage.setItem('rememberMe', 'true');
+            localStorage.setItem('savedEmail', email);
+        } else {
+            localStorage.removeItem('rememberMe');
+            localStorage.removeItem('savedEmail');
+        }
 
-        // Simulate API call (Replace with Supabase Auth later)
-        setTimeout(() => {
-            // Fake authentication
-            // Replace with Supabase Auth later
-            if (email === 'admin@amrani.ma' && password === 'admin123') {
-                // Success - redirect to admin dashboard (placeholder)
-                setLoading(false);
-                showLoginError('Connexion réussie ! Redirection en cours...', 'success');
-                setTimeout(() => {
-                    // Redirect to dashboard (placeholder)
-                    // window.location.href = 'admin_dashboard.html';
-                    alert('Connexion réussie ! (Redirection vers le tableau de bord)');
-                    setLoading(false);
-                }, 1500);
-            } else {
-                setLoading(false);
-                showLoginError('Email ou mot de passe incorrect. Veuillez réessayer.');
-                // Shake animation on error
+        showLoading();
+
+        try {
+            // ---- Step 1: Authenticate with Supabase Auth ----
+            const { user, error: loginErr } = await login(email, password);
+
+            if (loginErr) {
+                hideLoading();
+                showError(loginErr);
                 form.classList.add('shake');
                 setTimeout(() => form.classList.remove('shake'), 500);
+                return;
             }
-        }, 1500);
+
+            // ---- Step 2: Verify the user is an authorized admin ----
+            const isAdmin = await checkAdmin(user.id);
+
+            if (!isAdmin) {
+                // Not authorized — sign them out immediately, never let
+                // a non-admin keep an authenticated session on this page.
+                await supabaseClient.auth.signOut();
+                hideLoading();
+                showError('Vous n\'êtes pas autorisé à accéder au panneau d\'administration.');
+                return;
+            }
+
+            // ---- Step 3: Success — redirect to the admin panel ----
+            window.location.href = 'admin_panel.html';
+
+        } catch (err) {
+            console.error('Unexpected login error:', err);
+            hideLoading();
+            showError('Une erreur inattendue est survenue. Veuillez réessayer.');
+        }
     });
 
-    // Email format validation
-    function isValidEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
+    // ====================================================
+    // CORE AUTH FUNCTIONS
+    // ====================================================
 
-    // Clear all error messages
-    function clearErrors() {
-        emailError.textContent = '';
-        passwordError.textContent = '';
-        // Remove error class from inputs
-        document.querySelectorAll('.input-wrapper input').forEach(input => {
-            input.style.borderColor = '';
-        });
-    }
+    /**
+     * login(email, password)
+     * Authenticates against Supabase Auth.
+     * Returns { user } on success, or { error: "message" } on failure.
+     */
+    async function login(email, password) {
+        try {
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email,
+                password,
+            });
 
-    // Show login error message
-    function showLoginError(message, type = 'error') {
-        loginError.style.display = 'flex';
-        loginErrorMessage.textContent = message;
-        if (type === 'success') {
-            loginError.style.background = '#d1fae5';
-            loginError.style.color = '#065f46';
-            loginError.querySelector('svg').style.stroke = '#065f46';
-        } else {
-            loginError.style.background = '#fee2e2';
-            loginError.style.color = '#991b1b';
-            loginError.querySelector('svg').style.stroke = '#991b1b';
+            if (error) {
+                return { error: mapAuthError(error) };
+            }
+
+            if (!data || !data.user) {
+                return { error: 'Connexion impossible. Veuillez réessayer.' };
+            }
+
+            return { user: data.user };
+        } catch (err) {
+            console.error('Network/auth error during login:', err);
+            return { error: 'Impossible de contacter le serveur. Vérifiez votre connexion internet.' };
         }
     }
 
-    function hideLoginError() {
+    /**
+     * checkAdmin(userId)
+     * Checks whether the given auth user id exists in public.admins
+     * (matched against the admins.user_id column).
+     * Returns true if the user is an admin, false otherwise (including
+     * on any query error — fail closed for security).
+     */
+    async function checkAdmin(userId) {
+        try {
+            const { data, error } = await supabaseClient
+                .from('admins')
+                .select('id')
+                .eq('user_id', userId)
+                .maybeSingle();
+
+            if (error) {
+                console.error('Error checking admin status:', error);
+                return false; // Fail closed: any error = not authorized
+            }
+
+            return !!data;
+        } catch (err) {
+            console.error('Unexpected error checking admin status:', err);
+            return false;
+        }
+    }
+
+    /**
+     * checkExistingSession()
+     * On page load, checks if a valid Supabase session already exists.
+     * If it does AND the user is an admin, redirect straight to the
+     * admin panel. If a session exists but the user is NOT an admin,
+     * sign them out so they land back on a clean login form.
+     */
+    async function checkExistingSession() {
+        try {
+            const { data, error } = await supabaseClient.auth.getSession();
+
+            if (error) {
+                console.error('Error checking existing session:', error);
+                return;
+            }
+
+            const session = data && data.session;
+            if (!session || !session.user) return; // No session — stay on login page
+
+            const isAdmin = await checkAdmin(session.user.id);
+
+            if (isAdmin) {
+                window.location.href = 'admin_panel.html';
+            } else {
+                // Stale/non-admin session — clear it silently.
+                await supabaseClient.auth.signOut();
+            }
+        } catch (err) {
+            console.error('Unexpected error checking session:', err);
+        }
+    }
+
+    // ====================================================
+    // UI HELPERS
+    // ====================================================
+
+    /**
+     * showError(message)
+     * Displays a professional error message in the login form's error box.
+     */
+    function showError(message) {
+        loginError.style.display = 'flex';
+        loginErrorMessage.textContent = message;
+        loginError.style.background = '#fee2e2';
+        loginError.style.color = '#991b1b';
+        const svg = loginError.querySelector('svg');
+        if (svg) svg.style.stroke = '#991b1b';
+    }
+
+    function hideError() {
         loginError.style.display = 'none';
     }
 
-    // Set loading state on button
-    function setLoading(isLoading) {
+    /**
+     * showLoading() / hideLoading()
+     * Toggle the button's loading state during async auth calls.
+     */
+    function showLoading() {
+        setLoading(true);
+    }
+
+    function hideLoading() {
+        setLoading(false);
+    }
+
+    function setLoading(isLoading, options = {}) {
         if (isLoading) {
             loginBtnText.style.display = 'none';
             loginBtnLoader.style.display = 'inline-block';
@@ -140,61 +347,43 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             loginBtnText.style.display = 'inline';
             loginBtnLoader.style.display = 'none';
-            loginBtn.disabled = false;
-            loginBtn.style.opacity = '1';
+            loginBtn.disabled = !!options.disable;
+            loginBtn.style.opacity = options.disable ? '0.6' : '1';
         }
     }
 
-    // Real-time validation on input blur
-    emailInput.addEventListener('blur', function() {
-        const email = this.value.trim();
-        if (email && !isValidEmail(email)) {
-            emailError.textContent = 'Veuillez entrer un email valide';
-        } else {
-            emailError.textContent = '';
-        }
-    });
-
-    passwordInput.addEventListener('blur', function() {
-        const password = this.value.trim();
-        if (password && password.length < 6) {
-            passwordError.textContent = 'Le mot de passe doit contenir au moins 6 caractères';
-        } else {
-            passwordError.textContent = '';
-        }
-    });
-
-    // Clear errors on input
-    emailInput.addEventListener('input', function() {
-        emailError.textContent = '';
-        hideLoginError();
-    });
-
-    passwordInput.addEventListener('input', function() {
-        passwordError.textContent = '';
-        hideLoginError();
-    });
-
-    // Remember me functionality (localStorage)
-    if (localStorage.getItem('rememberMe') === 'true') {
-        rememberMe.checked = true;
-        const savedEmail = localStorage.getItem('savedEmail');
-        if (savedEmail) {
-            emailInput.value = savedEmail;
-        }
+    /**
+     * isValidEmail(email)
+     * Basic email format check.
+     */
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
 
-    rememberMe.addEventListener('change', function() {
-        if (this.checked) {
-            localStorage.setItem('rememberMe', 'true');
-            localStorage.setItem('savedEmail', emailInput.value);
-        } else {
-            localStorage.removeItem('rememberMe');
-            localStorage.removeItem('savedEmail');
-        }
-    });
+    /**
+     * mapAuthError(error)
+     * Converts raw Supabase Auth error messages into clean, professional
+     * French messages shown to the admin.
+     */
+    function mapAuthError(error) {
+        const msg = (error && error.message) ? error.message.toLowerCase() : '';
 
-    // Add shake animation CSS
+        if (msg.includes('invalid login credentials')) {
+            return 'Email ou mot de passe incorrect. Veuillez réessayer.';
+        }
+        if (msg.includes('email not confirmed')) {
+            return 'Veuillez confirmer votre email avant de vous connecter.';
+        }
+        if (msg.includes('too many requests') || msg.includes('rate limit')) {
+            return 'Trop de tentatives. Veuillez patienter avant de réessayer.';
+        }
+        if (msg.includes('network') || msg.includes('fetch')) {
+            return 'Impossible de contacter le serveur. Vérifiez votre connexion internet.';
+        }
+        return 'Une erreur est survenue lors de la connexion. Veuillez réessayer.';
+    }
+
+    // Expose the shake animation (kept from the original design).
     const style = document.createElement('style');
     style.textContent = `
         @keyframes shake {
