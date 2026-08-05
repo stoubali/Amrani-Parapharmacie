@@ -235,12 +235,19 @@
                     <div class="section-header">
                         <h2>Paramètres</h2>
                     </div>
+                    <div id="settingsNotification" class="settings-notification" style="display:none;"></div>
+                    <div id="settingsLoading" class="settings-loading" style="display:none;">Chargement des paramètres…</div>
                     <form id="settingsForm">
                         <div class="settings-grid">
                             <div class="settings-card">
                                 <h3>Informations de la pharmacie</h3>
                                 <div class="form-group"><label>Nom de la pharmacie</label><input type="text" id="settingsPharmacyName" value="Amrani Parapharmacie"></div>
-                                <div class="form-group"><label>Logo</label><input type="text" id="settingsLogo" value="💊"></div>
+                                <div class="form-group">
+                                    <label>Logo</label>
+                                    <img id="settingsLogoPreview" class="settings-img-preview" style="display:none;" alt="Aperçu du logo">
+                                    <input type="file" id="settingsLogo" accept="image/*">
+                                    <input type="hidden" id="settingsLogoUrl">
+                                </div>
                             </div>
                             <div class="settings-card">
                                 <h3>Hero</h3>
@@ -248,6 +255,12 @@
                                 <div class="form-group"><label>Titre (AR)</label><input type="text" id="settingsHeroTitleAR" value="صحتكم، أولويتنا"></div>
                                 <div class="form-group"><label>Description (FR)</label><textarea id="settingsHeroDescFR" rows="2">Parapharmacie de confiance, produits de qualité et conseils personnalisés</textarea></div>
                                 <div class="form-group"><label>Description (AR)</label><textarea id="settingsHeroDescAR" rows="2">صيدلية موثوقة، منتجات عالية الجودة ونصائح مخصصة</textarea></div>
+                                <div class="form-group">
+                                    <label>Image Hero</label>
+                                    <img id="settingsHeroImagePreview" class="settings-img-preview" style="display:none;" alt="Aperçu de l'image hero">
+                                    <input type="file" id="settingsHeroImage" accept="image/*">
+                                    <input type="hidden" id="settingsHeroImageUrl">
+                                </div>
                             </div>
                             <div class="settings-card">
                                 <h3>À propos</h3>
@@ -260,6 +273,7 @@
                                 <div class="form-group"><label>WhatsApp</label><input type="text" id="settingsWhatsApp" value="+212 6 11 22 33 44"></div>
                                 <div class="form-group"><label>Email</label><input type="email" id="settingsEmail" value="contact@amrani.ma"></div>
                                 <div class="form-group"><label>Adresse</label><input type="text" id="settingsAddress" value="123, Avenue Hassan II, Casablanca"></div>
+                                <div class="form-group"><label>Lien Google Maps</label><input type="url" id="settingsGoogleMaps" placeholder="https://maps.google.com/..."></div>
                             </div>
                             <div class="settings-card">
                                 <h3>Social & Horaires</h3>
@@ -268,12 +282,20 @@
                             </div>
                             <div class="settings-card">
                                 <h3>SEO</h3>
-                                <div class="form-group"><label>Favicon</label><input type="text" id="settingsFavicon" value="💊"></div>
+                                <div class="form-group">
+                                    <label>Favicon</label>
+                                    <img id="settingsFaviconPreview" class="settings-img-preview" style="display:none;" alt="Aperçu du favicon">
+                                    <input type="file" id="settingsFavicon" accept="image/*">
+                                    <input type="hidden" id="settingsFaviconUrl">
+                                </div>
                                 <div class="form-group"><label>Description SEO</label><textarea id="settingsSeoDesc" rows="2">Amrani Parapharmacie - Votre pharmacie de confiance</textarea></div>
                             </div>
                         </div>
                         <div class="settings-actions">
-                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                            <button type="submit" class="btn btn-primary" id="settingsSaveBtn">
+                                <span id="settingsSaveBtnText">Enregistrer</span>
+                                <span id="settingsSaveBtnLoader" class="loader" style="display:none;"></span>
+                            </button>
                             <button type="reset" class="btn btn-secondary">Réinitialiser</button>
                         </div>
                     </form>
@@ -395,6 +417,9 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/settings.js"></script>
     <script src="js/admin.js"></script>
 </body>
 </html>
