@@ -11,7 +11,7 @@
 - [x] Row Level Security (RLS)
 - [x] Storage Buckets
 - [x] Admin Authentication
-- [ ] Settings CRUD
+- [x] Settings CRUD
 - [ ] Categories CRUD
 - [ ] Products CRUD
 - [ ] Promotions CRUD
