@@ -11,13 +11,18 @@
 // SAME save/upload/validation/notification helpers as Create — only the
 // final insert-vs-update Supabase call differs.
 //
-// STEP 4 ADDITION: Delete Category, reusing the existing #deleteModal
-// confirmation modal, the existing image-deletion helper, and the existing
-// loadCategories()/showActionNotification() helpers. Handles the
-// product_categories foreign-key constraint safely (see deleteCategory()).
+// STEP 4 (unchanged, tested): Delete Category, reusing the existing
+// #deleteModal confirmation modal, the existing image-deletion helper, and
+// the existing loadCategories()/showActionNotification() helpers.
 //
-// Still NOT implemented here (later steps):
-//   - Search / filter
+// STEP 5 ADDITION: Category Search (#categorySearch), debounced ~300ms,
+// searching name_fr + name_ar server-side via ilike. loadCategories() was
+// extended with an optional searchTerm parameter — called with no argument
+// (as every existing call site still does) it behaves exactly as before.
+// A simple request counter (categoryLoadRequestId) discards stale
+// responses so an older in-flight search can never overwrite a newer one.
+//
+// Still NOT implemented here (later steps): pagination, sorting, filters.
 //
 // Requires (loaded before this file, in this order):
 //   1. https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2
@@ -48,6 +53,12 @@
   let initialized = false;
   let hasLoadedOnce = false;
 
+  // Bumped on every loadCategories() call; a response only gets applied if
+  // its captured id still matches this counter, i.e. no newer call has
+  // started since. Prevents an older (slower) search response from
+  // overwriting a newer one's results.
+  let categoryLoadRequestId = 0;
+
   // --- Step 2: Create Category — bucket + form state ---------------
   const CATEGORY_BUCKET = 'categories'; // existing bucket from 03_storage.sql
 
@@ -69,6 +80,10 @@
 
   let pendingCategoryImageFile = null;
   let isSavingCategory = false;
+
+  // --- Step 5: Category Search — state ------------------------------
+  let categorySearchInput = null;
+  let categorySearchDebounceTimer = null;
 
   // Simple inline SVG placeholder (NOT an emoji) used when image_url is empty.
   const PLACEHOLDER_IMAGE =
@@ -158,34 +173,65 @@
   }
 
   // ------------------------------------------------------------------
-  // Load categories from Supabase
+  // Step 5: escape ilike wildcard characters and quote the value so a
+  // search term containing %, _, \, or a comma/parenthesis is treated
+  // literally and can't break PostgREST's .or() filter syntax.
   // ------------------------------------------------------------------
-  async function loadCategories() {
+  function buildCategorySearchFilter(term) {
+    const escaped = term.replace(/[\\%_]/g, '\\$&');
+    return 'name_fr.ilike."%' + escaped + '%",name_ar.ilike."%' + escaped + '%"';
+  }
+
+  // ------------------------------------------------------------------
+  // Load categories from Supabase.
+  // searchTerm is optional — every existing call site calls this with no
+  // argument, which behaves exactly as it always has (no filter, full
+  // list, same order). Step 5 adds a server-side ilike filter on
+  // name_fr/name_ar only when a non-empty trimmed term is passed in.
+  // ------------------------------------------------------------------
+  async function loadCategories(searchTerm) {
     if (!window.supabaseClient) {
       showError('Configuration Supabase manquante. Impossible de charger les catégories.');
       console.error('CategoriesModule: window.supabaseClient introuvable. Vérifiez que js/supabase-client.js est chargé avant js/categories.js.');
       return;
     }
 
+    const requestId = ++categoryLoadRequestId;
+
     hideError();
     showLoading(true);
 
     try {
-      const { data, error } = await window.supabaseClient
+      let query = window.supabaseClient
         .from('categories')
-        .select('id, name_fr, name_ar, image_url, product_categories(count)')
-        .order('name_fr', { ascending: true });
+        .select('id, name_fr, name_ar, image_url, product_categories(count)');
+
+      const trimmedTerm = (searchTerm || '').trim();
+      if (trimmedTerm) {
+        query = query.or(buildCategorySearchFilter(trimmedTerm));
+      }
+
+      const { data, error } = await query.order('name_fr', { ascending: true });
+
+      // A newer loadCategories() call has started since this one was sent
+      // (e.g. the user kept typing). Its own response will render instead,
+      // so this older one is dropped silently — success or error alike.
+      if (requestId !== categoryLoadRequestId) return;
 
       if (error) throw error;
 
       renderRows(data);
       hasLoadedOnce = true;
     } catch (err) {
+      if (requestId !== categoryLoadRequestId) return; // stale — a newer call already handled the UI
+
       console.error('Erreur lors du chargement des catégories :', err);
       tableBody.innerHTML = '';
       showError('Impossible de charger les catégories. Vérifiez votre connexion et réessayez.');
     } finally {
-      showLoading(false);
+      if (requestId === categoryLoadRequestId) {
+        showLoading(false);
+      }
     }
   }
 
@@ -619,6 +665,27 @@
   }
 
 
+  // ------------------------------------------------------------------
+  // Step 5: Category Search — debounced ~300ms. Every keystroke cancels
+  // the previous timer (clearTimeout) and schedules a new one; only a
+  // pause of ~300ms without further typing actually triggers a query,
+  // via the existing loadCategories(). An empty/whitespace-only value
+  // naturally reloads the full list, since loadCategories() only filters
+  // when the trimmed term is non-empty.
+  // ------------------------------------------------------------------
+  function setupCategorySearch() {
+    categorySearchInput = document.getElementById('categorySearch');
+    if (!categorySearchInput) return;
+
+    categorySearchInput.addEventListener('input', function () {
+      const value = categorySearchInput.value;
+      clearTimeout(categorySearchDebounceTimer);
+      categorySearchDebounceTimer = setTimeout(function () {
+        loadCategories(value);
+      }, 300);
+    });
+  }
+
   function init() {
     if (initialized) return;
     initialized = true;
@@ -653,6 +720,9 @@
     // file input's change listener never gets attached.
     setupCategoryForm();
     setupCategoryImagePreview();
+
+    // Step 5: Category Search
+    setupCategorySearch();
   }
 
   // Expose a minimal public API — admin.js only calls init().
