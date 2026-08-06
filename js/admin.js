@@ -434,8 +434,9 @@ document.getElementById('confirmDelete').addEventListener('click', function() {
             renderProducts();
             break;
         case 'category':
-            categories = categories.filter(c => c.id !== deleteTarget);
-            renderCategories();
+            if (window.CategoriesModule && typeof window.CategoriesModule.deleteCategory === 'function') {
+                window.CategoriesModule.deleteCategory(deleteTarget);
+            }
             break;
         case 'promotion':
             promotions = promotions.filter(p => p.id !== deleteTarget);

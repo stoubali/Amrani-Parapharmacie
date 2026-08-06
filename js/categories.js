@@ -7,12 +7,16 @@
 // STEP 2 (unchanged, tested): Create Category, using the existing Add/Edit
 // Category modal.
 //
-// STEP 3 ADDITION: Edit Category, reusing the SAME modal and the SAME
-// save/upload/validation/notification helpers as Create — only the final
-// insert-vs-update Supabase call differs.
+// STEP 3 (unchanged, tested): Edit Category, reusing the SAME modal and the
+// SAME save/upload/validation/notification helpers as Create — only the
+// final insert-vs-update Supabase call differs.
+//
+// STEP 4 ADDITION: Delete Category, reusing the existing #deleteModal
+// confirmation modal, the existing image-deletion helper, and the existing
+// loadCategories()/showActionNotification() helpers. Handles the
+// product_categories foreign-key constraint safely (see deleteCategory()).
 //
 // Still NOT implemented here (later steps):
-//   - Delete category
 //   - Search / filter
 //
 // Requires (loaded before this file, in this order):
@@ -414,6 +418,81 @@
   }
 
   // ------------------------------------------------------------------
+  // Step 4: Delete Category — called from admin.js's existing
+  // #confirmDelete click handler (see the 'category' case there).
+  //
+  // Sequence:
+  //   1. Look up the category's image_url first (needed before deletion,
+  //      since the row won't be queryable afterward).
+  //   2. Delete the row from Supabase.
+  //      - On a foreign-key violation (Postgres code 23503 — the
+  //        category is still referenced in product_categories), stop
+  //        here: no image deleted, no table reload, just a friendly
+  //        notification and a full console.error.
+  //      - On any other delete error, same treatment with a generic
+  //        friendly message.
+  //   3. Only after the delete succeeds: remove the image file (if any)
+  //      via the existing deleteCategoryImage() helper — best-effort,
+  //      already fail-safe, never blocks step 4.
+  //   4. Reload the table via the existing loadCategories().
+  //   5. Show the existing success notification.
+  // ------------------------------------------------------------------
+  async function deleteCategory(id) {
+    if (!window.supabaseClient) {
+      showActionNotification('Configuration Supabase manquante. Impossible de supprimer la catégorie.', 'error');
+      return;
+    }
+
+    // Step 1: grab the image URL (if any) before the row is gone.
+    let imageUrl = null;
+    try {
+      const { data, error } = await window.supabaseClient
+        .from('categories')
+        .select('image_url')
+        .eq('id', id)
+        .single();
+      if (!error && data) imageUrl = data.image_url;
+    } catch (lookupErr) {
+      console.error('Impossible de récupérer l\'image de la catégorie avant suppression :', lookupErr);
+      // Not fatal — proceed with the delete anyway; image cleanup will
+      // simply be skipped if we don't know the URL.
+    }
+
+    // Step 2: delete the row.
+    const { error: deleteError } = await window.supabaseClient
+      .from('categories')
+      .delete()
+      .eq('id', id);
+
+    if (deleteError) {
+      console.error('Erreur lors de la suppression de la catégorie :', deleteError);
+
+      if (deleteError.code === '23503') {
+        // product_categories still references this category.
+        showActionNotification(
+          "Cette catégorie est encore associée à un ou plusieurs produits. Retirez ces associations avant de supprimer la catégorie.",
+          'error'
+        );
+      } else {
+        showActionNotification('Une erreur est survenue lors de la suppression de la catégorie.', 'error');
+      }
+      return; // No image deletion, no reload, no success notification.
+    }
+
+    // Step 3: delete succeeded — clean up the image, best-effort.
+    if (imageUrl) {
+      const path = getStoragePathFromPublicUrl(imageUrl, CATEGORY_BUCKET);
+      if (path) {
+        await deleteCategoryImage(path);
+      }
+    }
+
+    // Step 4 + 5: refresh the table and confirm success.
+    await loadCategories();
+    showActionNotification('✅ Catégorie supprimée avec succès.', 'success');
+  }
+
+  // ------------------------------------------------------------------
   // Step 2: Create Category — form submit handler
   // ------------------------------------------------------------------
   async function handleCategorySubmit(e) {
@@ -584,5 +663,6 @@
     init: init,
     reload: loadCategories, // handy for manual testing from the console
     editCategory: handleEditCategoryClick,
+    deleteCategory: deleteCategory,
   };
 })();
