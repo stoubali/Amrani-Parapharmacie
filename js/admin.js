@@ -552,11 +552,15 @@ document.addEventListener('DOMContentLoaded', function() {
     setupModals();
     populateCategorySelects();
     renderProducts();
-    renderCategories();
     renderPromotions();
     renderMessages();
     setupEvents();
     updateStats();
-    
+
+    // Categories table is now loaded from Supabase — see js/categories.js
+    if (window.CategoriesModule && typeof window.CategoriesModule.init === 'function') {
+        window.CategoriesModule.init();
+    }
+
     console.log('✅ Admin panel loaded — Données samples (remplacées par Supabase plus tard)');
 });

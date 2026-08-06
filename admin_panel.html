@@ -180,6 +180,8 @@
                         <h2>Gestion des Catégories</h2>
                         <button class="btn btn-primary btn-sm add-btn" data-modal="categoryModal">+ Ajouter</button>
                     </div>
+                    <div id="categoriesError" class="settings-notification settings-notification-error" style="display:none;"></div>
+                    <div id="categoriesLoading" class="settings-loading" style="display:none;">Chargement des catégories…</div>
                     <div class="table-responsive">
                         <table class="admin-table" id="categoriesTable">
                             <thead>
@@ -420,6 +422,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-client.js"></script>
     <script src="js/settings.js"></script>
+    <script src="js/categories.js"></script>
     <script src="js/admin.js"></script>
 </body>
 </html>

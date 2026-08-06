@@ -1529,6 +1529,15 @@ svg {
   font-size: 1.5rem;
 }
 
+.admin-table .category-thumb {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--gray-200);
+  background: var(--gray-50);
+}
+
 /* Settings Grid */
 .settings-grid {
   display: grid;
