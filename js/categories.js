@@ -4,10 +4,14 @@
 // STEP 1 SCOPE (unchanged, tested — do not modify): loads categories from
 // Supabase and renders them into the EXISTING #categoriesTable.
 //
-// STEP 2 ADDITION: Create Category, using the existing Add Category modal.
+// STEP 2 (unchanged, tested): Create Category, using the existing Add/Edit
+// Category modal.
+//
+// STEP 3 ADDITION: Edit Category, reusing the SAME modal and the SAME
+// save/upload/validation/notification helpers as Create — only the final
+// insert-vs-update Supabase call differs.
 //
 // Still NOT implemented here (later steps):
-//   - Edit category
 //   - Delete category
 //   - Search / filter
 //
@@ -47,6 +51,7 @@
 
   let categoryForm = null;
   let categoryFormError = null;
+  let categoryFormIdInput = null;
   let catNameFRInput = null;
   let catNameFRError = null;
   let catNameARInput = null;
@@ -129,7 +134,7 @@
             '<td>' + nameAr + '</td>' +
             '<td>' + productCount + '</td>' +
             '<td class="actions">' +
-              '<button class="btn-icon edit" onclick="editCategory(\'' + cat.id + '\')" title="Modifier">' +
+              '<button class="btn-icon edit" onclick="window.CategoriesModule.editCategory(\'' + cat.id + '\')" title="Modifier">' +
                 '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
                   '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>' +
                   '<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>' +
@@ -320,11 +325,13 @@
   }
 
   // ------------------------------------------------------------------
-  // Step 2: Create Category — reset the modal back to a blank state
+  // Step 2/3: reset the modal back to a blank "Add" state. Reused by:
+  // the "+ Ajouter" button, after a successful save, and as the first
+  // step of populateCategoryForm() before filling in Edit values.
   // ------------------------------------------------------------------
   function resetCategoryForm() {
     if (categoryForm) categoryForm.reset();
-    if (document.getElementById('categoryFormId')) document.getElementById('categoryFormId').value = '';
+    if (categoryFormIdInput) categoryFormIdInput.value = '';
     if (catImageUrlHidden) catImageUrlHidden.value = '';
     if (catImagePreview) {
       catImagePreview.removeAttribute('src');
@@ -333,6 +340,77 @@
     pendingCategoryImageFile = null;
     clearFieldErrors();
     hideFormError();
+
+    const titleEl = document.getElementById('categoryModalTitle');
+    if (titleEl) titleEl.textContent = 'Ajouter une catégorie';
+  }
+
+  // ------------------------------------------------------------------
+  // Step 3: Edit Category — fill the (already reset) form with the
+  // category's current values, loaded fresh from Supabase.
+  // ------------------------------------------------------------------
+  function populateCategoryForm(cat) {
+    resetCategoryForm();
+
+    if (categoryFormIdInput) categoryFormIdInput.value = cat.id;
+    if (catNameFRInput) catNameFRInput.value = cat.name_fr || '';
+    if (catNameARInput) catNameARInput.value = cat.name_ar || '';
+
+    // Keep the current image URL internally (used by handleCategorySubmit
+    // if the admin doesn't pick a replacement file) and show its preview.
+    if (catImageUrlHidden) catImageUrlHidden.value = cat.image_url || '';
+    if (cat.image_url && catImagePreview) {
+      catImagePreview.src = cat.image_url;
+      catImagePreview.style.display = 'block';
+    }
+
+    const titleEl = document.getElementById('categoryModalTitle');
+    if (titleEl) titleEl.textContent = 'Modifier la catégorie';
+  }
+
+  // ------------------------------------------------------------------
+  // Step 3: recover the storage path from a public URL (e.g. to delete
+  // the old image after a successful replace). Returns null if the URL
+  // doesn't look like it came from this bucket.
+  // ------------------------------------------------------------------
+  function getStoragePathFromPublicUrl(url, bucket) {
+    if (!url) return null;
+    const marker = '/storage/v1/object/public/' + bucket + '/';
+    const idx = url.indexOf(marker);
+    if (idx === -1) return null;
+    return url.slice(idx + marker.length);
+  }
+
+  // ------------------------------------------------------------------
+  // Step 3: Edit Category — Edit button click handler. Loads the
+  // selected category fresh from Supabase, then opens the existing
+  // Add/Edit modal (via the existing shared openModal helper) already
+  // populated.
+  // ------------------------------------------------------------------
+  async function handleEditCategoryClick(id) {
+    if (!window.supabaseClient) {
+      showActionNotification('Configuration Supabase manquante. Impossible de charger la catégorie.', 'error');
+      return;
+    }
+
+    try {
+      const { data, error } = await window.supabaseClient
+        .from('categories')
+        .select('id, name_fr, name_ar, image_url')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+
+      populateCategoryForm(data);
+
+      if (typeof window.openModal === 'function') {
+        window.openModal('categoryModal');
+      }
+    } catch (err) {
+      console.error('Erreur lors du chargement de la catégorie à modifier :', err);
+      showActionNotification('Impossible de charger cette catégorie pour modification.', 'error');
+    }
   }
 
   // ------------------------------------------------------------------
@@ -349,9 +427,13 @@
     if (!validateCategoryForm()) return;
 
     if (!window.supabaseClient) {
-      showFormError('Configuration Supabase manquante. Impossible de créer la catégorie.');
+      showFormError('Configuration Supabase manquante. Impossible d\'enregistrer la catégorie.');
       return;
     }
+
+    const categoryId = categoryFormIdInput ? categoryFormIdInput.value : '';
+    const isEditing = !!categoryId;
+    const oldImageUrl = catImageUrlHidden ? catImageUrlHidden.value : '';
 
     setCategorySaving(true);
 
@@ -371,22 +453,47 @@
         image_url: imageUrl,
       };
 
-      const { error } = await window.supabaseClient
-        .from('categories')
-        .insert(payload);
+      let saveError;
+      if (isEditing) {
+        ({ error: saveError } = await window.supabaseClient
+          .from('categories')
+          .update(payload)
+          .eq('id', categoryId));
+      } else {
+        ({ error: saveError } = await window.supabaseClient
+          .from('categories')
+          .insert(payload));
+      }
 
-      if (error) throw error;
+      if (saveError) throw saveError;
+
+      // Update succeeded. If this was an edit and a new image replaced an
+      // existing one, remove the old file so it doesn't linger as an
+      // orphan. Best-effort: deleteCategoryImage() already only logs on
+      // failure, it never throws, so this can never fail the save.
+      if (isEditing && pendingCategoryImageFile && oldImageUrl) {
+        const oldPath = getStoragePathFromPublicUrl(oldImageUrl, CATEGORY_BUCKET);
+        if (oldPath) {
+          await deleteCategoryImage(oldPath);
+        }
+      }
 
       if (typeof window.closeModal === 'function') {
         window.closeModal('categoryModal');
       }
       resetCategoryForm();
       await loadCategories();
-      showActionNotification('✅ Catégorie créée avec succès.', 'success');
+      showActionNotification(
+        isEditing ? '✅ Catégorie mise à jour avec succès.' : '✅ Catégorie créée avec succès.',
+        'success'
+      );
     } catch (err) {
-      console.error('Erreur lors de la création de la catégorie :', err);
+      console.error(
+        (isEditing ? 'Erreur lors de la mise à jour de la catégorie :' : 'Erreur lors de la création de la catégorie :'),
+        err
+      );
 
-      // The image upload succeeded but the DB insert failed (or something
+      // The image upload succeeded but the DB save failed (or something
       // after it threw) — remove the now-orphaned file from storage so it
       // doesn't accumulate.
       if (uploadedImagePath) {
@@ -405,6 +512,7 @@
   function setupCategoryForm() {
     categoryForm = document.getElementById('categoryForm');
     categoryFormError = document.getElementById('categoryFormError');
+    categoryFormIdInput = document.getElementById('categoryFormId');
     catNameFRInput = document.getElementById('catNameFR');
     catNameFRError = document.getElementById('catNameFRError');
     catNameARInput = document.getElementById('catNameAR');
@@ -469,8 +577,12 @@
   }
 
   // Expose a minimal public API — admin.js only calls init().
+  // editCategory is called directly from the row button's onclick (see
+  // renderRows), routed through this module object specifically to avoid
+  // colliding with the old global editCategory() still defined in admin.js.
   window.CategoriesModule = {
     init: init,
     reload: loadCategories, // handy for manual testing from the console
+    editCategory: handleEditCategoryClick,
   };
 })();
