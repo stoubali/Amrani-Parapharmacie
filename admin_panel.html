@@ -182,6 +182,7 @@
                     </div>
                     <div id="categoriesError" class="settings-notification settings-notification-error" style="display:none;"></div>
                     <div id="categoriesLoading" class="settings-loading" style="display:none;">Chargement des catégories…</div>
+                    <div id="categoriesActionNotification" class="settings-notification" style="display:none;"></div>
                     <div class="table-responsive">
                         <table class="admin-table" id="categoriesTable">
                             <thead>
@@ -347,14 +348,31 @@
         <div class="modal-container">
             <button class="modal-close close-modal">&times;</button>
             <h2 id="categoryModalTitle">Ajouter une catégorie</h2>
-            <form id="categoryForm">
+            <div id="categoryFormError" class="settings-notification settings-notification-error" style="display:none;"></div>
+            <form id="categoryForm" novalidate>
                 <input type="hidden" id="categoryFormId">
-                <div class="form-group"><label>Nom (FR)</label><input type="text" id="catNameFR" required></div>
-                <div class="form-group"><label>Nom (AR)</label><input type="text" id="catNameAR"></div>
-                <div class="form-group"><label>Image (emoji)</label><input type="text" id="catImage" placeholder="🧴"></div>
+                <div class="form-group">
+                    <label>Nom (FR)</label>
+                    <input type="text" id="catNameFR" required>
+                    <span class="error-msg" id="catNameFRError"></span>
+                </div>
+                <div class="form-group">
+                    <label>Nom (AR)</label>
+                    <input type="text" id="catNameAR">
+                </div>
+                <div class="form-group">
+                    <label>Image</label>
+                    <img id="catImagePreview" class="settings-img-preview" style="display:none;" alt="Aperçu de la catégorie">
+                    <input type="file" id="catImageFile" accept="image/*">
+                    <input type="hidden" id="catImageUrl">
+                    <span class="error-msg" id="catImageError"></span>
+                </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary close-modal">Annuler</button>
-                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    <button type="submit" class="btn btn-primary" id="categorySaveBtn">
+                        <span id="categorySaveBtnText">Enregistrer</span>
+                        <span id="categorySaveBtnLoader" class="loader" style="display:none;"></span>
+                    </button>
                 </div>
             </form>
         </div>

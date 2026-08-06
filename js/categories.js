@@ -1,18 +1,15 @@
 // ====================================================================
 // js/categories.js — Categories Module (Amrani Parapharmacie)
 // ====================================================================
-// STEP 1 SCOPE: loads categories from Supabase and renders them into the
-// EXISTING #categoriesTable in admin_panel.html. The Edit/Delete buttons
-// and the "+ Ajouter" button are left exactly as they were — still wired
-// to the old demo-array functions in admin.js (editCategory, saveCategory,
-// confirmDelete). They are NOT yet connected to Supabase.
+// STEP 1 SCOPE (unchanged, tested — do not modify): loads categories from
+// Supabase and renders them into the EXISTING #categoriesTable.
 //
-// Explicitly NOT implemented here (later steps):
-//   - Add category
+// STEP 2 ADDITION: Create Category, using the existing Add Category modal.
+//
+// Still NOT implemented here (later steps):
 //   - Edit category
 //   - Delete category
 //   - Search / filter
-//   - Image upload
 //
 // Requires (loaded before this file, in this order):
 //   1. https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2
@@ -42,6 +39,27 @@
 
   let initialized = false;
   let hasLoadedOnce = false;
+
+  // --- Step 2: Create Category — bucket + form state ---------------
+  const CATEGORY_BUCKET = 'categories'; // existing bucket from 03_storage.sql
+
+  let actionNotificationEl = null;
+
+  let categoryForm = null;
+  let categoryFormError = null;
+  let catNameFRInput = null;
+  let catNameFRError = null;
+  let catNameARInput = null;
+  let catImageFileInput = null;
+  let catImagePreview = null;
+  let catImageUrlHidden = null;
+  let catImageError = null;
+  let categorySaveBtn = null;
+  let categorySaveBtnText = null;
+  let categorySaveBtnLoader = null;
+
+  let pendingCategoryImageFile = null;
+  let isSavingCategory = false;
 
   // Simple inline SVG placeholder (NOT an emoji) used when image_url is empty.
   const PLACEHOLDER_IMAGE =
@@ -163,8 +181,257 @@
   }
 
   // ------------------------------------------------------------------
-  // Init — called explicitly by admin.js
+  // Step 2: Create Category — notification helpers
   // ------------------------------------------------------------------
+  function showActionNotification(message, type) {
+    if (!actionNotificationEl) {
+      window.alert(message);
+      return;
+    }
+    actionNotificationEl.textContent = message;
+    actionNotificationEl.className =
+      'settings-notification settings-notification-' + (type || 'info');
+    actionNotificationEl.style.display = 'block';
+    clearTimeout(showActionNotification._t);
+    showActionNotification._t = setTimeout(() => {
+      actionNotificationEl.style.display = 'none';
+    }, 4000);
+  }
+
+  function showFormError(message) {
+    if (!categoryFormError) {
+      window.alert(message);
+      return;
+    }
+    categoryFormError.textContent = message;
+    categoryFormError.style.display = 'block';
+  }
+
+  function hideFormError() {
+    if (categoryFormError) categoryFormError.style.display = 'none';
+  }
+
+  function clearFieldErrors() {
+    if (catNameFRError) catNameFRError.textContent = '';
+    if (catImageError) catImageError.textContent = '';
+  }
+
+  // ------------------------------------------------------------------
+  // Step 2: Create Category — form validation
+  // ------------------------------------------------------------------
+  function validateCategoryForm() {
+    let isValid = true;
+    clearFieldErrors();
+
+    const nameFr = catNameFRInput.value.trim();
+    if (!nameFr) {
+      catNameFRError.textContent = 'Le nom de la catégorie (FR) est requis.';
+      isValid = false;
+    }
+
+    if (pendingCategoryImageFile && !pendingCategoryImageFile.type.startsWith('image/')) {
+      catImageError.textContent = 'Veuillez sélectionner un fichier image valide.';
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  // ------------------------------------------------------------------
+  // Step 2: Create Category — image preview (before upload)
+  // ------------------------------------------------------------------
+  function setupCategoryImagePreview() {
+    if (!catImageFileInput) return;
+
+    catImageFileInput.addEventListener('change', () => {
+      const file = catImageFileInput.files && catImageFileInput.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        if (catImageError) catImageError.textContent = 'Veuillez sélectionner un fichier image valide.';
+        catImageFileInput.value = '';
+        return;
+      }
+
+      if (catImageError) catImageError.textContent = '';
+      pendingCategoryImageFile = file;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        catImagePreview.src = e.target.result;
+        catImagePreview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // Step 2: Create Category — upload image to the "categories" bucket
+  // Returns { path, publicUrl } — the path is needed so an orphaned file
+  // can be removed if the subsequent database insert fails.
+  // ------------------------------------------------------------------
+  async function uploadCategoryImage(file) {
+    const ext = (file.name.split('.').pop() || 'png').toLowerCase();
+    const path = Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+
+    const { error: uploadError } = await window.supabaseClient
+      .storage
+      .from(CATEGORY_BUCKET)
+      .upload(path, file, { upsert: true, cacheControl: '3600' });
+
+    if (uploadError) throw uploadError;
+
+    const { data } = window.supabaseClient
+      .storage
+      .from(CATEGORY_BUCKET)
+      .getPublicUrl(path);
+
+    return { path: path, publicUrl: data.publicUrl };
+  }
+
+  // ------------------------------------------------------------------
+  // Step 2: Create Category — remove an uploaded file that ended up
+  // orphaned because the database insert failed after the upload
+  // succeeded. Best-effort: failures here are logged, not surfaced to
+  // the admin (the insert error is already the message they see).
+  // ------------------------------------------------------------------
+  async function deleteCategoryImage(path) {
+    if (!path || !window.supabaseClient) return;
+    try {
+      const { error } = await window.supabaseClient
+        .storage
+        .from(CATEGORY_BUCKET)
+        .remove([path]);
+      if (error) throw error;
+    } catch (cleanupErr) {
+      console.error('Impossible de supprimer le fichier orphelin "' + path + '" :', cleanupErr);
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // Step 2: Create Category — save button loading state
+  // ------------------------------------------------------------------
+  function setCategorySaving(isSaving) {
+    isSavingCategory = isSaving;
+    if (!categorySaveBtn) return;
+    categorySaveBtn.disabled = isSaving;
+    if (categorySaveBtnText) categorySaveBtnText.style.display = isSaving ? 'none' : 'inline';
+    if (categorySaveBtnLoader) categorySaveBtnLoader.style.display = isSaving ? 'inline-block' : 'none';
+  }
+
+  // ------------------------------------------------------------------
+  // Step 2: Create Category — reset the modal back to a blank state
+  // ------------------------------------------------------------------
+  function resetCategoryForm() {
+    if (categoryForm) categoryForm.reset();
+    if (document.getElementById('categoryFormId')) document.getElementById('categoryFormId').value = '';
+    if (catImageUrlHidden) catImageUrlHidden.value = '';
+    if (catImagePreview) {
+      catImagePreview.removeAttribute('src');
+      catImagePreview.style.display = 'none';
+    }
+    pendingCategoryImageFile = null;
+    clearFieldErrors();
+    hideFormError();
+  }
+
+  // ------------------------------------------------------------------
+  // Step 2: Create Category — form submit handler
+  // ------------------------------------------------------------------
+  async function handleCategorySubmit(e) {
+    e.preventDefault();
+
+    // Guard against duplicate submissions (double-click, double-tap, etc.)
+    if (isSavingCategory) return;
+
+    hideFormError();
+
+    if (!validateCategoryForm()) return;
+
+    if (!window.supabaseClient) {
+      showFormError('Configuration Supabase manquante. Impossible de créer la catégorie.');
+      return;
+    }
+
+    setCategorySaving(true);
+
+    let uploadedImagePath = null; // set only once the upload itself has succeeded
+
+    try {
+      let imageUrl = catImageUrlHidden ? catImageUrlHidden.value || null : null;
+      if (pendingCategoryImageFile) {
+        const uploadResult = await uploadCategoryImage(pendingCategoryImageFile);
+        uploadedImagePath = uploadResult.path;
+        imageUrl = uploadResult.publicUrl;
+      }
+
+      const payload = {
+        name_fr: catNameFRInput.value.trim(),
+        name_ar: catNameARInput.value.trim() || null,
+        image_url: imageUrl,
+      };
+
+      const { error } = await window.supabaseClient
+        .from('categories')
+        .insert(payload);
+
+      if (error) throw error;
+
+      if (typeof window.closeModal === 'function') {
+        window.closeModal('categoryModal');
+      }
+      resetCategoryForm();
+      await loadCategories();
+      showActionNotification('✅ Catégorie créée avec succès.', 'success');
+    } catch (err) {
+      console.error('Erreur lors de la création de la catégorie :', err);
+
+      // The image upload succeeded but the DB insert failed (or something
+      // after it threw) — remove the now-orphaned file from storage so it
+      // doesn't accumulate.
+      if (uploadedImagePath) {
+        await deleteCategoryImage(uploadedImagePath);
+      }
+
+      showFormError("Une erreur est survenue lors de l'enregistrement. Veuillez réessayer.");
+    } finally {
+      setCategorySaving(false);
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // Step 2: Create Category — wire up the form + the "+ Ajouter" button
+  // ------------------------------------------------------------------
+  function setupCategoryForm() {
+    categoryForm = document.getElementById('categoryForm');
+    categoryFormError = document.getElementById('categoryFormError');
+    catNameFRInput = document.getElementById('catNameFR');
+    catNameFRError = document.getElementById('catNameFRError');
+    catNameARInput = document.getElementById('catNameAR');
+    catImageFileInput = document.getElementById('catImageFile');
+    catImagePreview = document.getElementById('catImagePreview');
+    catImageUrlHidden = document.getElementById('catImageUrl');
+    catImageError = document.getElementById('catImageError');
+    categorySaveBtn = document.getElementById('categorySaveBtn');
+    categorySaveBtnText = document.getElementById('categorySaveBtnText');
+    categorySaveBtnLoader = document.getElementById('categorySaveBtnLoader');
+
+    if (!categoryForm) {
+      console.error('CategoriesModule: #categoryForm introuvable.');
+      return;
+    }
+
+    categoryForm.addEventListener('submit', handleCategorySubmit);
+
+    // Make sure "+ Ajouter" always opens a clean form, even if a previous
+    // attempt was left filled in or failed.
+    const addBtn = categoriesSection.querySelector('.add-btn');
+    if (addBtn) {
+      addBtn.addEventListener('click', resetCategoryForm);
+    }
+  }
+
+
   function init() {
     if (initialized) return;
     initialized = true;
@@ -173,6 +440,7 @@
     tableWrapper = categoriesSection.querySelector('.table-responsive');
     loadingEl = document.getElementById('categoriesLoading');
     errorEl = document.getElementById('categoriesError');
+    actionNotificationEl = document.getElementById('categoriesActionNotification');
 
     if (!tableBody) {
       console.error('CategoriesModule: #categoriesTable tbody introuvable.');
@@ -190,6 +458,14 @@
         loadCategories();
       });
     }
+
+    // Step 2: Create Category
+    // NOTE: setupCategoryForm() must run first — it assigns catImageFileInput
+    // (and the other modal refs). setupCategoryImagePreview() depends on
+    // catImageFileInput already being set, otherwise it exits early and the
+    // file input's change listener never gets attached.
+    setupCategoryForm();
+    setupCategoryImagePreview();
   }
 
   // Expose a minimal public API — admin.js only calls init().
