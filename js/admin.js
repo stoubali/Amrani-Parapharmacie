@@ -552,7 +552,6 @@ document.addEventListener('DOMContentLoaded', function() {
     setupSidebarToggle();
     setupModals();
     populateCategorySelects();
-    renderProducts();
     renderPromotions();
     renderMessages();
     setupEvents();
@@ -561,6 +560,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Categories table is now loaded from Supabase — see js/categories.js
     if (window.CategoriesModule && typeof window.CategoriesModule.init === 'function') {
         window.CategoriesModule.init();
+    }
+
+    // Products table is now loaded from Supabase — see js/products.js
+    if (window.ProductsModule?.init) {
+        window.ProductsModule.init();
     }
 
     console.log('✅ Admin panel loaded — Données samples (remplacées par Supabase plus tard)');

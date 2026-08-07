@@ -1512,6 +1512,15 @@ svg {
   background: var(--gray-100);
 }
 
+.admin-table .btn-icon:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.admin-table .btn-icon:disabled:hover {
+  background: none;
+}
+
 .admin-table .btn-icon.edit:hover {
   color: var(--primary);
 }

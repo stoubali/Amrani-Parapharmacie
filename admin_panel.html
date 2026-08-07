@@ -164,6 +164,8 @@
                             <select id="productCategoryFilter"><option value="all">Toutes catégories</option></select>
                         </div>
                     </div>
+                    <div id="productsError" class="settings-notification settings-notification-error" style="display:none;"></div>
+                    <div id="productsLoading" class="settings-loading" style="display:none;">Chargement des produits…</div>
                     <div class="table-responsive">
                         <table class="admin-table" id="productsTable">
                             <thead>
@@ -447,6 +449,7 @@
     <script src="js/supabase-client.js"></script>
     <script src="js/settings.js"></script>
     <script src="js/categories.js"></script>
+    <script src="js/products.js"></script>
     <script src="js/admin.js"></script>
 </body>
 </html>
