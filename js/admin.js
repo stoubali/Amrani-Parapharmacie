@@ -504,9 +504,6 @@ function populateCategorySelects() {
 
 // ---------- SETUP EVENTS ----------
 function setupEvents() {
-    // Product form
-    document.getElementById('productForm').addEventListener('submit', saveProduct);
-    
     // Category form
     document.getElementById('categoryForm').addEventListener('submit', saveCategory);
     
@@ -532,17 +529,6 @@ function setupEvents() {
         if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
             window.location.href = 'login_admin.html';
         }
-    });
-    
-    // Add product button opens modal with reset
-    document.querySelector('#section-products .add-btn').addEventListener('click', function() {
-        document.getElementById('productModalTitle').textContent = 'Ajouter un produit';
-        document.getElementById('productForm').reset();
-        document.getElementById('productFormId').value = '';
-        document.getElementById('prodAvailable').checked = true;
-        document.getElementById('prodFeatured').checked = false;
-        // Reset category selection
-        document.getElementById('prodCategories').selectedIndex = -1;
     });
 }
 

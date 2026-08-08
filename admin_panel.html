@@ -165,6 +165,7 @@
                         </div>
                     </div>
                     <div id="productsError" class="settings-notification settings-notification-error" style="display:none;"></div>
+                    <div id="productsActionNotification" class="settings-notification" style="display:none;"></div>
                     <div id="productsLoading" class="settings-loading" style="display:none;">Chargement des produits…</div>
                     <div class="table-responsive">
                         <table class="admin-table" id="productsTable">
@@ -321,10 +322,15 @@
         <div class="modal-container modal-lg">
             <button class="modal-close close-modal">&times;</button>
             <h2 id="productModalTitle">Ajouter un produit</h2>
-            <form id="productForm">
+            <div id="productFormError" class="settings-notification settings-notification-error" style="display:none;"></div>
+            <form id="productForm" novalidate>
                 <input type="hidden" id="productFormId">
                 <div class="form-row">
-                    <div class="form-group"><label>Nom (FR)</label><input type="text" id="prodNameFR" required></div>
+                    <div class="form-group">
+                        <label>Nom (FR)</label>
+                        <input type="text" id="prodNameFR" required>
+                        <span class="error-msg" id="prodNameFRError"></span>
+                    </div>
                     <div class="form-group"><label>Nom (AR)</label><input type="text" id="prodNameAR"></div>
                 </div>
                 <div class="form-row">
@@ -332,11 +338,21 @@
                     <div class="form-group"><label>Description (AR)</label><textarea id="prodDescAR" rows="2"></textarea></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>Image (emoji)</label><input type="text" id="prodImage" placeholder="🧴"></div>
-                    <div class="form-group"><label>Marque</label><input type="text" id="prodBrand" required></div>
+                    <div class="form-group">
+                        <label>Image</label>
+                        <img id="prodImagePreview" class="settings-img-preview" style="display:none;" alt="Aperçu du produit">
+                        <input type="file" id="prodImageFile" accept="image/*">
+                        <input type="hidden" id="prodImageUrl">
+                        <span class="error-msg" id="prodImageError"></span>
+                    </div>
+                    <div class="form-group"><label>Marque</label><input type="text" id="prodBrand"></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>Prix (DH)</label><input type="number" id="prodPrice" required></div>
+                    <div class="form-group">
+                        <label>Prix (DH)</label>
+                        <input type="number" id="prodPrice" step="0.01" min="0" required>
+                        <span class="error-msg" id="prodPriceError"></span>
+                    </div>
                     <div class="form-group"><label>Catégories</label><select id="prodCategories" multiple></select></div>
                 </div>
                 <div class="form-row">
@@ -345,7 +361,10 @@
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary close-modal">Annuler</button>
-                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    <button type="submit" class="btn btn-primary" id="productSaveBtn">
+                        <span id="productSaveBtnText">Enregistrer</span>
+                        <span id="productSaveBtnLoader" class="loader" style="display:none;"></span>
+                    </button>
                 </div>
             </form>
         </div>
