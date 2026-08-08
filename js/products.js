@@ -12,16 +12,59 @@
 // "transaction" across public.products + public.product_categories with
 // rollback if any later step fails.
 //
-// STEP 3 ADDITION: Edit Product, reusing the SAME modal and the SAME
-// save/upload/validation/notification/reset helpers as Create — only the
-// final insert-vs-update Supabase calls differ, plus a full replace of
-// that product's product_categories rows, plus rollback logic to restore
-// the product row and its category links if the category update fails
-// after the product update already succeeded.
+// STEP 3 (unchanged, tested — do not modify): Edit Product, reusing the
+// SAME modal and the SAME save/upload/validation/notification/reset
+// helpers as Create — only the final insert-vs-update Supabase calls
+// differ, plus a full replace of that product's product_categories rows,
+// plus rollback logic to restore the product row and its category links
+// if the category update fails after the product update already
+// succeeded.
+//
+// STEP 4 (unchanged, tested — do not modify): Delete Product, reusing the
+// existing generic #deleteModal confirmation modal (via the existing
+// global confirmDelete()/admin.js dispatch — same pattern as Categories),
+// the existing image-deletion helper, and the existing
+// loadProducts()/showProductActionNotification() helpers. Per
+// 01_schema.sql, public.product_categories.product_id is declared
+// "on delete cascade", so deleting a product row automatically removes
+// its category links — no manual product_categories delete is performed.
+//
+// STEP 5 (unchanged, tested — do not modify): Product Search
+// (#productSearch), debounced ~300ms, searching name_fr + name_ar +
+// brand server-side via ilike — the real text columns on public.products
+// that make sense for search (per 01_schema.sql; name_fr and brand are
+// trigram-indexed in 04_indexes.sql, name_ar is not, same asymmetry
+// Categories already has for its own bilingual fields).
+//
+// STEP 6 (unchanged, tested — do not modify): Product Filters —
+// specifically the Category filter (#productCategoryFilter), the only
+// filter control that actually exists in admin_panel.html. Populated
+// from real public.categories (id, name_fr) — never demo data.
+// loadProducts() was extended with a second optional parameter,
+// categoryId, alongside the existing optional searchTerm; called with no
+// arguments (as every CRUD-reload call site still does) it behaves
+// exactly as before. When a category is selected, the query switches the
+// product_categories embed to Supabase's `!inner` join modifier plus
+// `.eq('product_categories.category_id', id)`, which is required to
+// filter the parent products rows themselves (not just the nested
+// array) — 01_schema.sql's product_categories is the only relationship
+// linking products to categories. Search and the category filter are
+// combined on the same query (AND), via a shared triggerProductsReload()
+// helper used by both the search debounce callback and the filter's
+// change handler, so neither can overwrite the other's condition.
+//
+// STEP 7 ADDITION: View Product — strictly read-only. Reuses the new
+// #productViewModal (admin_panel.html) rather than the Create/Edit form,
+// to guarantee nothing can be accidentally written while viewing.
+// Fetches the product fresh via a single SELECT (same field/embed shape
+// already proven by Edit/loadProducts), reuses the existing
+// getCategoryNames() and PLACEHOLDER_IMAGE helpers, and opens the modal
+// immediately in a loading state (never showing stale data from a
+// previous View) before swapping in the fetched product's real data.
 //
 // Explicitly NOT implemented here (later steps):
-//   - Delete product
-//   - Search / filter
+//   - Other filters (brand / price / availability / featured) — no
+//     corresponding UI controls exist in admin_panel.html
 //   - Pagination
 //   - Dashboard statistics
 //   - Landing page integration
@@ -60,6 +103,39 @@
   let initialized = false;
   let hasLoadedOnce = false;
 
+  // Bumped on every loadProducts() call; a response only gets applied if
+  // its captured id still matches this counter, i.e. no newer call has
+  // started since. Prevents an older (slower) search response from
+  // overwriting a newer one's results. Mirrors categoryLoadRequestId.
+  let productLoadRequestId = 0;
+
+  // --- Step 5: Product Search — state -----------------------------------
+  let productSearchInput = null;
+  let productSearchDebounceTimer = null;
+
+  // --- Step 6 (Product Filters): Category filter — state --------------
+  let productCategoryFilterSelect = null;
+
+  // --- Step 7: View Product — state -------------------------------------
+  let productViewLoadingEl = null;
+  let productViewErrorEl = null;
+  let productViewContentEl = null;
+  let pvImage = null;
+  let pvNameFR = null;
+  let pvNameARRow = null;
+  let pvNameAR = null;
+  let pvBrand = null;
+  let pvPrice = null;
+  let pvAvailable = null;
+  let pvFeatured = null;
+  let pvDescFRRow = null;
+  let pvDescFR = null;
+  let pvDescARRow = null;
+  let pvDescAR = null;
+  let pvCategories = null;
+
+  let isViewingProduct = false; // guards against overlapping View requests
+
   // --- Step 2: Create Product — bucket + form state -------------------
   const PRODUCT_BUCKET = 'products'; // existing bucket from 03_storage.sql
 
@@ -95,6 +171,14 @@
   // product_categories update can restore both the product row and its
   // previous category links. Cleared on every resetProductForm() call.
   let editSnapshot = null; // { productId, previousValues, previousCategoryIds }
+
+  // --- Step 4: Delete Product — duplicate-execution guard --------------
+  // admin.js's generic #confirmDelete handler already nulls out
+  // deleteTarget/deleteType synchronously after dispatching (the same
+  // protection Categories relies on), but this flag adds a second,
+  // Products-local guard in case deleteProduct() is ever invoked
+  // directly (e.g. from the console) while a delete is already in flight.
+  let isDeletingProduct = false;
 
   // Same inline SVG placeholder used by Categories (NOT an emoji), used
   // when a product's image_url is empty.
@@ -192,7 +276,7 @@
             '<td><span class="badge ' + (isAvailable ? 'badge-success' : 'badge-danger') + '">' +
               (isAvailable ? 'Oui' : 'Non') + '</span></td>' +
             '<td class="actions">' +
-              '<button class="btn-icon view" disabled title="Disponible dans une prochaine étape">' +
+              '<button class="btn-icon view" onclick="window.ProductsModule.viewProduct(\'' + p.id + '\')" title="Voir">' +
                 '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
                   '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>' +
                 '</svg>' +
@@ -203,7 +287,7 @@
                   '<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>' +
                 '</svg>' +
               '</button>' +
-              '<button class="btn-icon delete" disabled title="Disponible dans une prochaine étape">' +
+              '<button class="btn-icon delete" onclick="confirmDelete(\'product\', \'' + p.id + '\')" title="Supprimer">' +
                 '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
                   '<polyline points="3 6 5 6 21 6"/>' +
                   '<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>' +
@@ -217,34 +301,90 @@
   }
 
   // ------------------------------------------------------------------
-  // Load products from Supabase
+  // Step 5: escape ilike wildcard characters and quote the value so a
+  // search term containing %, _, \, or a comma/parenthesis is treated
+  // literally and can't break PostgREST's .or() filter syntax. Mirrors
+  // buildCategorySearchFilter() in categories.js, adapted to the real
+  // Products text columns that make sense for search: name_fr, name_ar,
+  // brand (see 01_schema.sql).
   // ------------------------------------------------------------------
-  async function loadProducts() {
+  function buildProductSearchFilter(term) {
+    const escaped = term.replace(/[\\%_]/g, '\\$&');
+    return 'name_fr.ilike."%' + escaped + '%",name_ar.ilike."%' + escaped + '%",brand.ilike."%' + escaped + '%"';
+  }
+
+  // Load products from Supabase.
+  // searchTerm and categoryId are both optional — every CRUD-reload call
+  // site (init(), the sidebar reload, and every Create/Edit/Delete
+  // success path) calls this with no arguments, which behaves exactly as
+  // it always has (no filter, full list, same order). Step 5 added a
+  // server-side ilike filter on name_fr/name_ar/brand when a non-empty
+  // trimmed searchTerm is passed. Step 6 adds a server-side category
+  // filter when a non-empty categoryId other than 'all' is passed; both
+  // conditions are applied together (AND) when both are present.
+  async function loadProducts(searchTerm, categoryId) {
     if (!window.supabaseClient) {
       showError('Configuration Supabase manquante. Impossible de charger les produits.');
       console.error('ProductsModule: window.supabaseClient introuvable. Vérifiez que js/supabase-client.js est chargé avant js/products.js.');
       return;
     }
 
+    const requestId = ++productLoadRequestId;
+
     hideError();
     showLoading(true);
 
     try {
-      const { data, error } = await window.supabaseClient
+      const trimmedTerm = (searchTerm || '').trim();
+      const trimmedCategoryId = (categoryId || '').trim();
+      const hasCategoryFilter = !!trimmedCategoryId && trimmedCategoryId !== 'all';
+
+      // The nested product_categories(categories(name_fr)) embed is used
+      // both for display (the "Catégories" column) and, when a category
+      // filter is active, for filtering. Supabase's `!inner` modifier
+      // turns the embed into an inner join so only products with a
+      // matching product_categories row survive, and .eq() on the
+      // joined table narrows that further to the selected category.
+      // Without an active filter, the plain embed is used exactly as
+      // before, so products with zero categories still appear.
+      const selectColumns = hasCategoryFilter
+        ? 'id, name_fr, name_ar, brand, price, image_url, is_available, is_featured, product_categories!inner(category_id, categories(name_fr))'
+        : 'id, name_fr, name_ar, brand, price, image_url, is_available, is_featured, product_categories(categories(name_fr))';
+
+      let query = window.supabaseClient
         .from('products')
-        .select('id, name_fr, name_ar, brand, price, image_url, is_available, is_featured, product_categories(categories(name_fr))')
-        .order('name_fr', { ascending: true });
+        .select(selectColumns);
+
+      if (hasCategoryFilter) {
+        query = query.eq('product_categories.category_id', trimmedCategoryId);
+      }
+
+      if (trimmedTerm) {
+        query = query.or(buildProductSearchFilter(trimmedTerm));
+      }
+
+      const { data, error } = await query.order('name_fr', { ascending: true });
+
+      // A newer loadProducts() call has started since this one was sent
+      // (e.g. the user kept typing, or changed the filter). Its own
+      // response will render instead, so this older one is dropped
+      // silently — success or error alike.
+      if (requestId !== productLoadRequestId) return;
 
       if (error) throw error;
 
       renderRows(data);
       hasLoadedOnce = true;
     } catch (err) {
+      if (requestId !== productLoadRequestId) return; // stale — a newer call already handled the UI
+
       console.error('Erreur lors du chargement des produits :', err);
       tableBody.innerHTML = '';
       showError('Impossible de charger les produits. Vérifiez votre connexion et réessayez.');
     } finally {
-      showLoading(false);
+      if (requestId === productLoadRequestId) {
+        showLoading(false);
+      }
     }
   }
 
@@ -869,6 +1009,272 @@
     }
   }
 
+  // ====================================================================
+  // STEP 4: Delete Product
+  // ====================================================================
+  // Called from admin.js's existing #confirmDelete click handler (see
+  // the 'product' case there, which delegates to this function — the
+  // same dispatch pattern already used for 'category').
+  //
+  // Sequence:
+  //   1. Look up the product's image_url first (needed before deletion,
+  //      since the row won't be queryable afterward). If this lookup
+  //      fails (product not found / network error), stop here — no
+  //      deletion is attempted.
+  //   2. Delete the row from public.products.
+  //      - public.product_categories.product_id is declared
+  //        "on delete cascade" in 01_schema.sql, so this single delete
+  //        also removes the product's category links automatically.
+  //        No manual product_categories delete is performed — doing so
+  //        would be redundant against the same cascade, and 01_schema.sql
+  //        defines no OTHER foreign key that references products.id, so
+  //        there is no restrictive FK that could block this delete under
+  //        the current schema. The 23503 branch below is kept only for
+  //        defensive consistency with Categories' delete handler; it is
+  //        not reachable given the current schema.
+  //      - On any delete error, stop: no image deleted, no table
+  //        reload, just a friendly notification and a full console.error.
+  //   3. Only after the delete succeeds: remove the image file (if any)
+  //      via the existing deleteProductImage() helper — best-effort,
+  //      already fail-safe (logs but never throws), never blocks step 4,
+  //      and never causes a successful deletion to be reported as failed.
+  //   4. Reload the table via the existing loadProducts().
+  //   5. Show the existing success notification.
+  // ------------------------------------------------------------------
+  async function deleteProduct(id) {
+    if (!window.supabaseClient) {
+      showProductActionNotification('Configuration Supabase manquante. Impossible de supprimer le produit.', 'error');
+      return;
+    }
+
+    if (isDeletingProduct) return; // guard against duplicate/overlapping delete calls
+    isDeletingProduct = true;
+
+    try {
+      // Step 1: grab the image URL (if any) before the row is gone. If
+      // the product can't be found/read, stop — nothing has been
+      // deleted, so there's nothing to roll back.
+      let imageUrl = null;
+      try {
+        const { data, error } = await window.supabaseClient
+          .from('products')
+          .select('image_url')
+          .eq('id', id)
+          .single();
+        if (error) throw error;
+        imageUrl = data.image_url;
+      } catch (lookupErr) {
+        console.error('Impossible de récupérer le produit avant suppression :', lookupErr);
+        showProductActionNotification("Impossible de trouver ce produit. Il a peut-être déjà été supprimé.", 'error');
+        return;
+      }
+
+      // Step 2: delete the row. Cascade (see comment above) handles
+      // product_categories automatically.
+      const { error: deleteError } = await window.supabaseClient
+        .from('products')
+        .delete()
+        .eq('id', id);
+
+      if (deleteError) {
+        console.error('Erreur lors de la suppression du produit :', deleteError);
+
+        if (deleteError.code === '23503') {
+          // Defensive only — see note above; not reachable under the
+          // current schema, since no restrictive FK targets products.id.
+          showProductActionNotification(
+            "Ce produit est encore référencé ailleurs et ne peut pas être supprimé.",
+            'error'
+          );
+        } else {
+          showProductActionNotification('Une erreur est survenue lors de la suppression du produit.', 'error');
+        }
+        return; // No image deletion, no reload, no success notification.
+      }
+
+      // Step 3: delete succeeded — clean up the image, best-effort. A
+      // cleanup failure here is logged but must NOT be reported as an
+      // overall failure, since the database deletion already succeeded.
+      if (imageUrl) {
+        const path = getStoragePathFromPublicUrl(imageUrl, PRODUCT_BUCKET);
+        if (path) {
+          await deleteProductImage(path);
+        }
+      }
+
+      // Step 4 + 5: refresh the table and confirm success.
+      await loadProducts();
+      showProductActionNotification('✅ Produit supprimé avec succès.', 'success');
+    } finally {
+      isDeletingProduct = false;
+    }
+  }
+
+  // ====================================================================
+  // STEP 7: View Product (read-only)
+  // ====================================================================
+
+  // ------------------------------------------------------------------
+  // DOM refs for the #productViewModal — resolved once, lazily, mirroring
+  // setupProductForm()'s pattern.
+  // ------------------------------------------------------------------
+  function setupProductViewModal() {
+    productViewLoadingEl = document.getElementById('productViewLoading');
+    productViewErrorEl = document.getElementById('productViewError');
+    productViewContentEl = document.getElementById('productViewContent');
+    pvImage = document.getElementById('pvImage');
+    pvNameFR = document.getElementById('pvNameFR');
+    pvNameARRow = document.getElementById('pvNameARRow');
+    pvNameAR = document.getElementById('pvNameAR');
+    pvBrand = document.getElementById('pvBrand');
+    pvPrice = document.getElementById('pvPrice');
+    pvAvailable = document.getElementById('pvAvailable');
+    pvFeatured = document.getElementById('pvFeatured');
+    pvDescFRRow = document.getElementById('pvDescFRRow');
+    pvDescFR = document.getElementById('pvDescFR');
+    pvDescARRow = document.getElementById('pvDescARRow');
+    pvDescAR = document.getElementById('pvDescAR');
+    pvCategories = document.getElementById('pvCategories');
+  }
+
+  // ------------------------------------------------------------------
+  // Small state helpers for the View modal — loading / error / content
+  // are mutually exclusive, so a fetch never shows stale data from a
+  // previous View alongside a new loading spinner or a new error.
+  // ------------------------------------------------------------------
+  function showProductViewLoading() {
+    if (productViewLoadingEl) productViewLoadingEl.style.display = 'block';
+    if (productViewErrorEl) productViewErrorEl.style.display = 'none';
+    if (productViewContentEl) productViewContentEl.style.display = 'none';
+  }
+
+  function showProductViewError(message) {
+    if (productViewLoadingEl) productViewLoadingEl.style.display = 'none';
+    if (productViewContentEl) productViewContentEl.style.display = 'none';
+    if (productViewErrorEl) {
+      productViewErrorEl.textContent = message;
+      productViewErrorEl.style.display = 'block';
+    } else {
+      window.alert(message);
+    }
+  }
+
+  function showProductViewContent() {
+    if (productViewLoadingEl) productViewLoadingEl.style.display = 'none';
+    if (productViewErrorEl) productViewErrorEl.style.display = 'none';
+    if (productViewContentEl) productViewContentEl.style.display = 'block';
+  }
+
+  // ------------------------------------------------------------------
+  // Populate #productViewModal with a product fetched fresh from
+  // Supabase. Read-only — no field here is ever written back.
+  // ------------------------------------------------------------------
+  function populateProductViewModal(product) {
+    if (pvImage) {
+      pvImage.src = product.image_url ? product.image_url : PLACEHOLDER_IMAGE;
+      pvImage.style.display = 'block';
+    }
+
+    if (pvNameFR) pvNameFR.textContent = product.name_fr || '-';
+
+    if (product.name_ar) {
+      if (pvNameAR) pvNameAR.textContent = product.name_ar;
+      if (pvNameARRow) pvNameARRow.style.display = '';
+    } else if (pvNameARRow) {
+      pvNameARRow.style.display = 'none';
+    }
+
+    if (pvBrand) pvBrand.textContent = product.brand || '-';
+    if (pvPrice) {
+      pvPrice.textContent = (product.price === null || product.price === undefined)
+        ? '-'
+        : product.price + ' DH';
+    }
+
+    if (pvAvailable) {
+      pvAvailable.innerHTML = '<span class="badge ' + (product.is_available ? 'badge-success' : 'badge-danger') + '">' +
+        (product.is_available ? 'Oui' : 'Non') + '</span>';
+    }
+    if (pvFeatured) {
+      pvFeatured.innerHTML = product.is_featured
+        ? '<span class="badge badge-warning">★ Vedette</span>'
+        : '<span class="badge badge-danger">Non</span>';
+    }
+
+    if (product.description_fr) {
+      if (pvDescFR) pvDescFR.textContent = product.description_fr;
+      if (pvDescFRRow) pvDescFRRow.style.display = '';
+      if (pvDescFR) pvDescFR.style.display = '';
+    } else {
+      if (pvDescFRRow) pvDescFRRow.style.display = 'none';
+      if (pvDescFR) pvDescFR.style.display = 'none';
+    }
+
+    if (product.description_ar) {
+      if (pvDescAR) pvDescAR.textContent = product.description_ar;
+      if (pvDescARRow) pvDescARRow.style.display = '';
+      if (pvDescAR) pvDescAR.style.display = '';
+    } else {
+      if (pvDescARRow) pvDescARRow.style.display = 'none';
+      if (pvDescAR) pvDescAR.style.display = 'none';
+    }
+
+    // Reuses the existing getCategoryNames() helper (already handles the
+    // "no categories" case by returning '-') — no duplicated logic, and
+    // the same nested product_categories(categories(name_fr)) shape
+    // already used by the table and by Edit.
+    if (pvCategories) pvCategories.textContent = getCategoryNames(product);
+  }
+
+  // ------------------------------------------------------------------
+  // View button click handler. Opens #productViewModal immediately in a
+  // loading state (never showing stale data from a previous View), then
+  // fetches the real product fresh from Supabase by its real UUID —
+  // never the demo array, never a row index/position. Strictly
+  // read-only: a single SELECT, nothing else.
+  // ------------------------------------------------------------------
+  async function handleViewProductClick(id) {
+    if (isViewingProduct) return; // guard against overlapping View requests
+    isViewingProduct = true;
+
+    if (typeof window.openModal === 'function') {
+      window.openModal('productViewModal');
+    }
+    showProductViewLoading();
+
+    try {
+      if (!window.supabaseClient) {
+        showProductViewError('Configuration Supabase manquante. Impossible de charger le produit.');
+        console.error('ProductsModule: window.supabaseClient introuvable.');
+        return;
+      }
+
+      const { data, error } = await window.supabaseClient
+        .from('products')
+        .select('id, name_fr, name_ar, description_fr, description_ar, brand, price, image_url, is_available, is_featured, product_categories(categories(name_fr))')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+
+      populateProductViewModal(data);
+      showProductViewContent();
+    } catch (err) {
+      console.error('Erreur lors du chargement du produit à afficher :', err);
+
+      // PGRST116 = PostgREST's "0 rows" error for .single() — the
+      // product no longer exists (e.g. deleted by someone else since the
+      // table was last loaded). Any other error is a generic failure.
+      if (err && err.code === 'PGRST116') {
+        showProductViewError('Produit introuvable.');
+      } else {
+        showProductViewError('Impossible de charger ce produit. Veuillez réessayer.');
+      }
+    } finally {
+      isViewingProduct = false;
+    }
+  }
+
   // ------------------------------------------------------------------
   // Wire up the form + the "+ Ajouter" button.
   // NOTE: setupProductForm() must run first — it assigns
@@ -919,6 +1325,92 @@
   }
 
   // ------------------------------------------------------------------
+  // Step 6: reads the current search input value and the current
+  // category filter value together and issues a single combined
+  // loadProducts() call. Used by both the search debounce callback and
+  // the category filter's change handler, so a search-in-progress and a
+  // filter change can never overwrite each other's condition.
+  // ------------------------------------------------------------------
+  function triggerProductsReload() {
+    const searchValue = productSearchInput ? productSearchInput.value : '';
+    const categoryValue = productCategoryFilterSelect ? productCategoryFilterSelect.value : 'all';
+    loadProducts(searchValue, categoryValue);
+  }
+
+  // ------------------------------------------------------------------
+  // Step 5: Product Search — debounced ~300ms. Every keystroke cancels
+  // the previous timer (clearTimeout) and schedules a new one; only a
+  // pause of ~300ms without further typing actually triggers a query,
+  // via the existing loadProducts(). An empty/whitespace-only value
+  // naturally reloads the full list, since loadProducts() only filters
+  // when the trimmed term is non-empty. Mirrors setupCategorySearch().
+  // Step 6: the debounced query now also includes the current category
+  // filter selection, via triggerProductsReload(), so search + filter
+  // combine instead of overwriting each other.
+  // ------------------------------------------------------------------
+  function setupProductSearch() {
+    productSearchInput = document.getElementById('productSearch');
+    if (!productSearchInput) return;
+
+    productSearchInput.addEventListener('input', function () {
+      clearTimeout(productSearchDebounceTimer);
+      productSearchDebounceTimer = setTimeout(function () {
+        triggerProductsReload();
+      }, 300);
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // Step 6: Product Filters — populate #productCategoryFilter with REAL
+  // rows from public.categories (id, name_fr), never demo data. Keeps
+  // "Toutes catégories" (value="all") as the first option and preserves
+  // the currently selected filter across reloads, if it still exists.
+  // ------------------------------------------------------------------
+  async function loadCategoryOptionsForProductFilter() {
+    if (!productCategoryFilterSelect || !window.supabaseClient) return;
+    try {
+      const { data, error } = await window.supabaseClient
+        .from('categories')
+        .select('id, name_fr')
+        .order('name_fr', { ascending: true });
+
+      if (error) throw error;
+
+      const previouslySelected = productCategoryFilterSelect.value || 'all';
+
+      const optionsHtml = (data || [])
+        .map((cat) => '<option value="' + escapeHtml(cat.id) + '">' + escapeHtml(cat.name_fr) + '</option>')
+        .join('');
+
+      productCategoryFilterSelect.innerHTML = '<option value="all">Toutes catégories</option>' + optionsHtml;
+
+      const stillExists = Array.from(productCategoryFilterSelect.options).some(
+        (opt) => opt.value === previouslySelected
+      );
+      productCategoryFilterSelect.value = stillExists ? previouslySelected : 'all';
+    } catch (err) {
+      console.error('Erreur lors du chargement des catégories pour le filtre produit :', err);
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // Step 6: Product Filters — wire the category filter's change event.
+  // A filter change applies immediately (no debounce needed for a
+  // <select>), and cancels any pending debounced search so the two never
+  // race — the combined search+filter query fires right away via the
+  // shared triggerProductsReload() helper.
+  // ------------------------------------------------------------------
+  function setupProductCategoryFilter() {
+    productCategoryFilterSelect = document.getElementById('productCategoryFilter');
+    if (!productCategoryFilterSelect) return;
+
+    productCategoryFilterSelect.addEventListener('change', function () {
+      clearTimeout(productSearchDebounceTimer);
+      triggerProductsReload();
+    });
+  }
+
+  // ------------------------------------------------------------------
   // Init — called explicitly by admin.js
   // ------------------------------------------------------------------
   function init() {
@@ -951,16 +1443,31 @@
     setupProductForm();
     setupProductImagePreview();
     loadCategoryOptionsForProductForm();
+
+    // Step 5: Product Search
+    setupProductSearch();
+
+    // Step 6: Product Filters (Category)
+    setupProductCategoryFilter();
+    loadCategoryOptionsForProductFilter();
+
+    // Step 7: View Product
+    setupProductViewModal();
   }
 
-  // Expose a minimal public API — admin.js only calls init(). editProduct
-  // is called directly from the row button's onclick (see renderRows),
-  // routed through this module object specifically to avoid colliding
-  // with the old global editProduct() still defined in admin.js — same
-  // pattern used by CategoriesModule.editCategory.
+  // Expose a minimal public API — admin.js only calls init(). editProduct,
+  // deleteProduct, and viewProduct are called directly (editProduct/
+  // viewProduct from the row buttons' onclick — see renderRows;
+  // deleteProduct from admin.js's generic #confirmDelete handler's
+  // 'product' case), routed through this module object specifically to
+  // avoid colliding with the old global editProduct()/viewProduct()/
+  // demo-array delete still defined in admin.js — same pattern used by
+  // CategoriesModule.
   window.ProductsModule = {
     init: init,
     reload: loadProducts, // handy for manual testing from the console
     editProduct: handleEditProductClick,
+    deleteProduct: deleteProduct,
+    viewProduct: handleViewProductClick,
   };
 })();

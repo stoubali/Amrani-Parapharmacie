@@ -451,6 +451,33 @@
         </div>
     </div>
 
+    <!-- Product View Modal (read-only) -->
+    <div class="modal-overlay" id="productViewModal">
+        <div class="modal-container">
+            <button class="modal-close close-modal">&times;</button>
+            <h2>Détails du produit</h2>
+            <div id="productViewLoading" class="settings-loading" style="display:none;">Chargement du produit…</div>
+            <div id="productViewError" class="settings-notification settings-notification-error" style="display:none;"></div>
+            <div id="productViewContent" style="display:none;">
+                <img id="pvImage" class="settings-img-preview" alt="Image du produit">
+                <p><strong>Nom (FR):</strong> <span id="pvNameFR"></span></p>
+                <p id="pvNameARRow"><strong>Nom (AR):</strong> <span id="pvNameAR"></span></p>
+                <p><strong>Marque:</strong> <span id="pvBrand"></span></p>
+                <p><strong>Prix:</strong> <span id="pvPrice"></span></p>
+                <p><strong>Disponible:</strong> <span id="pvAvailable"></span></p>
+                <p><strong>Mis en avant:</strong> <span id="pvFeatured"></span></p>
+                <p id="pvDescFRRow"><strong>Description (FR):</strong></p>
+                <p id="pvDescFR" style="background: var(--gray-50); padding: 1rem; border-radius: var(--radius-sm);"></p>
+                <p id="pvDescARRow"><strong>Description (AR):</strong></p>
+                <p id="pvDescAR" style="background: var(--gray-50); padding: 1rem; border-radius: var(--radius-sm);" dir="rtl"></p>
+                <p><strong>Catégories:</strong> <span id="pvCategories"></span></p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary close-modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Delete Confirmation Modal -->
     <div class="modal-overlay" id="deleteModal">
         <div class="modal-container modal-sm">

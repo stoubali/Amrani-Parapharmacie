@@ -430,8 +430,9 @@ document.getElementById('confirmDelete').addEventListener('click', function() {
     
     switch(deleteType) {
         case 'product':
-            products = products.filter(p => p.id !== deleteTarget);
-            renderProducts();
+            if (window.ProductsModule && typeof window.ProductsModule.deleteProduct === 'function') {
+                window.ProductsModule.deleteProduct(deleteTarget);
+            }
             break;
         case 'category':
             if (window.CategoriesModule && typeof window.CategoriesModule.deleteCategory === 'function') {
@@ -487,7 +488,10 @@ function updateStats() {
 
 // ---------- POPULATE CATEGORY SELECTS ----------
 function populateCategorySelects() {
-    const selects = ['prodCategories', 'productCategoryFilter'];
+    // NOTE: 'productCategoryFilter' is intentionally NOT in this list.
+    // It is populated with real Supabase categories by
+    // ProductsModule (see js/products.js, loadCategoryOptionsForProductFilter()).
+    const selects = ['prodCategories'];
     selects.forEach(id => {
         const select = document.getElementById(id);
         if (!select) return;
@@ -495,9 +499,6 @@ function populateCategorySelects() {
         select.innerHTML = categories.map(c => 
             `<option value="${c.nameFR}">${c.nameFR}</option>`
         ).join('');
-        if (id === 'productCategoryFilter') {
-            select.innerHTML = '<option value="all">Toutes catégories</option>' + select.innerHTML;
-        }
         if (currentVal) select.value = currentVal;
     });
 }
@@ -510,10 +511,9 @@ function setupEvents() {
     // Promotion form
     document.getElementById('promoForm').addEventListener('submit', savePromotion);
     
-    // Product search
-    document.getElementById('productSearch').addEventListener('input', renderProducts);
-    document.getElementById('productCategoryFilter').addEventListener('change', renderProducts);
-    
+    // Product search & category filter are now owned by ProductsModule
+    // (real Supabase search + real category filter) — see js/products.js.
+
     // Message search & filter
     document.getElementById('messageSearch').addEventListener('input', renderMessages);
     document.getElementById('messageFilter').addEventListener('change', renderMessages);
