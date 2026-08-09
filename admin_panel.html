@@ -248,6 +248,9 @@
                             <select id="messageFilter"><option value="all">Tous</option><option value="unread">Non lus</option><option value="read">Lus</option></select>
                         </div>
                     </div>
+                    <div id="messagesError" class="settings-notification settings-notification-error" style="display:none;"></div>
+                    <div id="messagesLoading" class="settings-loading" style="display:none;">Chargement des messages…</div>
+                    <div id="messagesActionNotification" class="settings-notification" style="display:none;"></div>
                     <div class="table-responsive">
                         <table class="admin-table" id="messagesTable">
                             <thead>
@@ -466,6 +469,8 @@
         <div class="modal-container">
             <button class="modal-close close-modal">&times;</button>
             <h2>Message</h2>
+            <div id="messageViewLoading" class="settings-loading" style="display:none;">Chargement du message…</div>
+            <div id="messageViewError" class="settings-notification settings-notification-error" style="display:none;"></div>
             <div id="messageContent">
                 <p><strong>Nom:</strong> <span id="msgName"></span></p>
                 <p><strong>Email:</strong> <span id="msgEmail"></span></p>
@@ -477,6 +482,8 @@
             </div>
             <div class="modal-actions">
                 <button class="btn btn-secondary close-modal">Fermer</button>
+                <!-- Only shown for unread messages — populateMessageViewModal()
+                     hides it again once a message is already read. -->
                 <button class="btn btn-primary" id="msgMarkRead">Marquer comme lu</button>
             </div>
         </div>
@@ -528,6 +535,7 @@
     <script src="js/categories.js"></script>
     <script src="js/products.js"></script>
     <script src="js/promotions.js"></script>
+    <script src="js/messages.js"></script>
     <script src="js/admin.js"></script>
 </body>
 </html>

@@ -445,8 +445,9 @@ document.getElementById('confirmDelete').addEventListener('click', function() {
             }
             break;
         case 'message':
-            messages = messages.filter(m => m.id !== deleteTarget);
-            renderMessages();
+            if (window.MessagesModule && typeof window.MessagesModule.deleteMessage === 'function') {
+                window.MessagesModule.deleteMessage(deleteTarget);
+            }
             break;
     }
     
@@ -522,9 +523,13 @@ function setupEvents() {
     // Product search & category filter are now owned by ProductsModule
     // (real Supabase search + real category filter) — see js/products.js.
 
-    // Message search & filter
-    document.getElementById('messageSearch').addEventListener('input', renderMessages);
-    document.getElementById('messageFilter').addEventListener('change', renderMessages);
+    // Message search & filter are NOT wired to the demo renderMessages()
+    // anymore. Messages are now loaded from Supabase by MessagesModule
+    // (js/messages.js). Leaving these listeners pointed at renderMessages()
+    // would silently overwrite the real Supabase-rendered table with the
+    // fake demo `messages` array on every keystroke/change — the exact
+    // dual-execution bug already found and fixed for Promotions. Real
+    // search/filter for Messages will be wired up in a later step.
     
     // Settings form
     document.getElementById('settingsForm').addEventListener('submit', function(e) {
@@ -546,7 +551,6 @@ document.addEventListener('DOMContentLoaded', function() {
     setupSidebarToggle();
     setupModals();
     populateCategorySelects();
-    renderMessages();
     setupEvents();
     updateStats();
 
@@ -566,6 +570,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // every page load.
     if (window.PromotionsModule?.init) {
         window.PromotionsModule.init();
+    }
+
+    // Messages table is now loaded from Supabase (Step 1: read-only) —
+    // see js/messages.js. The demo renderMessages() call was removed
+    // above, and its search/filter listeners were disconnected in
+    // setupEvents(), for the same reason the old demo promotion
+    // listener was removed: to prevent the fake array from silently
+    // overwriting the real Supabase-rendered table.
+    if (window.MessagesModule?.init) {
+        window.MessagesModule.init();
     }
 
     console.log('✅ Admin panel loaded — Données samples (remplacées par Supabase plus tard)');
