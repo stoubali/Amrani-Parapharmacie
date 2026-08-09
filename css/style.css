@@ -1564,6 +1564,23 @@ svg {
   animation: spin 0.8s ease-in-out infinite;
 }
 
+#promoSaveBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+#promoSaveBtn .loader {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  border-top-color: var(--white);
+  animation: spin 0.8s ease-in-out infinite;
+}
+
 /* Settings Grid */
 .settings-grid {
   display: grid;

@@ -208,6 +208,22 @@
                         <h2>Gestion des Promotions</h2>
                         <button class="btn btn-primary btn-sm add-btn" data-modal="promoModal">+ Ajouter</button>
                     </div>
+                    <div class="section-controls">
+                        <div class="search-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <input type="text" id="promotionSearch" placeholder="Rechercher...">
+                        </div>
+                        <div class="filter-box">
+                            <select id="promotionStatusFilter">
+                                <option value="all">Tous les statuts</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="promotionsError" class="settings-notification settings-notification-error" style="display:none;"></div>
+                    <div id="promotionsLoading" class="settings-loading" style="display:none;">Chargement des promotions…</div>
+                    <div id="promotionsActionNotification" class="settings-notification" style="display:none;"></div>
                     <div class="table-responsive">
                         <table class="admin-table" id="promotionsTable">
                             <thead>
@@ -410,21 +426,36 @@
         <div class="modal-container">
             <button class="modal-close close-modal">&times;</button>
             <h2 id="promoModalTitle">Ajouter une promotion</h2>
-            <form id="promoForm">
+            <div id="promoFormError" class="settings-notification settings-notification-error" style="display:none;"></div>
+            <form id="promoForm" novalidate>
                 <input type="hidden" id="promoFormId">
-                <div class="form-group"><label>Titre (FR)</label><input type="text" id="promoTitleFR" required></div>
+                <div class="form-group">
+                    <label>Titre (FR)</label>
+                    <input type="text" id="promoTitleFR" required>
+                    <span class="error-msg" id="promoTitleFRError"></span>
+                </div>
                 <div class="form-group"><label>Titre (AR)</label><input type="text" id="promoTitleAR"></div>
                 <div class="form-group"><label>Description (FR)</label><textarea id="promoDescFR" rows="2"></textarea></div>
                 <div class="form-group"><label>Description (AR)</label><textarea id="promoDescAR" rows="2"></textarea></div>
-                <div class="form-group"><label>Image (emoji)</label><input type="text" id="promoImage" placeholder="🎯"></div>
+                <div class="form-group">
+                    <label>Image</label>
+                    <img id="promoImagePreview" class="settings-img-preview" style="display:none;" alt="Aperçu de la promotion">
+                    <input type="file" id="promoImageFile" accept="image/*">
+                    <input type="hidden" id="promoImageUrl">
+                    <span class="error-msg" id="promoImageError"></span>
+                </div>
                 <div class="form-row">
                     <div class="form-group"><label>Date de début</label><input type="date" id="promoStart"></div>
                     <div class="form-group"><label>Date de fin</label><input type="date" id="promoEnd"></div>
                 </div>
+                <span class="error-msg" id="promoDatesError"></span>
                 <div class="form-group"><label><input type="checkbox" id="promoActive" checked> Active</label></div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary close-modal">Annuler</button>
-                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    <button type="submit" class="btn btn-primary" id="promoSaveBtn">
+                        <span id="promoSaveBtnText">Enregistrer</span>
+                        <span id="promoSaveBtnLoader" class="loader" style="display:none;"></span>
+                    </button>
                 </div>
             </form>
         </div>
@@ -496,6 +527,7 @@
     <script src="js/settings.js"></script>
     <script src="js/categories.js"></script>
     <script src="js/products.js"></script>
+    <script src="js/promotions.js"></script>
     <script src="js/admin.js"></script>
 </body>
 </html>

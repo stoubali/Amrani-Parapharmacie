@@ -440,8 +440,9 @@ document.getElementById('confirmDelete').addEventListener('click', function() {
             }
             break;
         case 'promotion':
-            promotions = promotions.filter(p => p.id !== deleteTarget);
-            renderPromotions();
+            if (window.PromotionsModule && typeof window.PromotionsModule.deletePromotion === 'function') {
+                window.PromotionsModule.deletePromotion(deleteTarget);
+            }
             break;
         case 'message':
             messages = messages.filter(m => m.id !== deleteTarget);
@@ -507,10 +508,17 @@ function populateCategorySelects() {
 function setupEvents() {
     // Category form
     document.getElementById('categoryForm').addEventListener('submit', saveCategory);
-    
-    // Promotion form
-    document.getElementById('promoForm').addEventListener('submit', savePromotion);
-    
+
+    // Promotion form is now owned by PromotionsModule (js/promotions.js),
+    // which binds its own real Supabase submit handler to #promoForm.
+    // The old demo savePromotion() listener was removed from here: if
+    // left in place it would have fired alongside the real handler on
+    // every submit (a form's submit event doesn't stop other listeners
+    // just because one of them calls preventDefault()), pushing a fake
+    // row into the local demo array and re-rendering the table with
+    // renderPromotions() — silently overwriting the real Supabase data
+    // that PromotionsModule had just saved and reloaded.
+
     // Product search & category filter are now owned by ProductsModule
     // (real Supabase search + real category filter) — see js/products.js.
 
@@ -538,7 +546,6 @@ document.addEventListener('DOMContentLoaded', function() {
     setupSidebarToggle();
     setupModals();
     populateCategorySelects();
-    renderPromotions();
     renderMessages();
     setupEvents();
     updateStats();
@@ -551,6 +558,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Products table is now loaded from Supabase — see js/products.js
     if (window.ProductsModule?.init) {
         window.ProductsModule.init();
+    }
+
+    // Promotions table is now loaded from Supabase (Step 1: read-only)
+    // — see js/promotions.js. renderPromotions() removed above since it
+    // was writing the fake demo array over the real Supabase table on
+    // every page load.
+    if (window.PromotionsModule?.init) {
+        window.PromotionsModule.init();
     }
 
     console.log('✅ Admin panel loaded — Données samples (remplacées par Supabase plus tard)');
