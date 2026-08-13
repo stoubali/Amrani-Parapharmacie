@@ -60,6 +60,8 @@
     <!-- ========== PRODUCTS GRID ========== -->
     <section class="products-grid-section">
       <div class="container">
+        <div id="productsError" class="settings-notification settings-notification-error" style="display:none;"></div>
+        <div id="productsLoading" class="settings-loading" style="display:none;">Chargement des produits…</div>
         <div id="productGrid" class="product-grid">
           <!-- Rendu par JavaScript -->
         </div>
@@ -118,6 +120,12 @@
   </div>
 
   <!-- ========== SCRIPTS ========== -->
-  <script src="js/products.js"></script>
+  <!-- js/products.js is the ADMIN Products module (guarded on
+       #section-products, which doesn't exist on this page — it was a
+       stale/no-op reference here). The public Products page gets its
+       own small module instead, per project architecture. -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/public-products.js"></script>
 </body>
 </html>

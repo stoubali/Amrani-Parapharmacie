@@ -8,6 +8,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <!-- Populated from settings.favicon_url by js/index.js, if set — left without
+       an href when no favicon is configured, same as the current default. -->
+  <link rel="icon" id="faviconLink">
 </head>
 <body>
   <!-- ========== NAVBAR ========== -->
@@ -39,14 +42,14 @@
           <div class="hero-logo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4z"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4 12H2"/><path d="M22 12h-2"/><path d="M19.1 4.9l-1.4 1.4"/><path d="M6.3 17.7l-1.4 1.4"/><path d="M17.7 6.3l1.4-1.4"/><path d="M6.3 6.3l-1.4-1.4"/></svg>
           </div>
-          <h1 class="hero-title">Votre santé, notre priorité</h1>
-          <p class="hero-description">Parapharmacie de confiance, produits de qualité et conseils personnalisés pour toute la famille.</p>
+          <h1 class="hero-title" id="heroTitle">Votre santé, notre priorité</h1>
+          <p class="hero-description" id="heroDescription">Parapharmacie de confiance, produits de qualité et conseils personnalisés pour toute la famille.</p>
           <div class="hero-buttons">
             <a href="#products" class="btn btn-primary">Voir les produits</a>
             <a href="#contact" class="btn btn-outline">Nous contacter</a>
           </div>
         </div>
-        <div class="hero-image" aria-hidden="true"></div>
+        <div class="hero-image" id="heroImage" aria-hidden="true"></div>
       </div>
     </section>
 
@@ -87,7 +90,7 @@
         </div>
         <div class="about-content">
           <h2>À propos de notre parapharmacie</h2>
-          <p>Amrani Parapharmacie est un espace dédié à votre bien-être. Nous sélectionnons avec soin des produits de haute qualité, issus des meilleures marques, pour vous offrir des solutions efficaces en dermocosmétique, hygiène, santé et nutrition.</p>
+          <p id="aboutTextFR">Amrani Parapharmacie est un espace dédié à votre bien-être. Nous sélectionnons avec soin des produits de haute qualité, issus des meilleures marques, pour vous offrir des solutions efficaces en dermocosmétique, hygiène, santé et nutrition.</p>
           <p>Notre équipe de professionnels est à votre écoute pour vous conseiller et vous accompagner dans tous vos besoins.</p>
         </div>
       </div>
@@ -104,47 +107,53 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.574 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
               </span>
               <h4>Téléphone</h4>
-              <p>+212 5 22 33 44 55</p>
+              <p id="contactPhone">+212 5 22 33 44 55</p>
             </div>
             <div class="contact-card">
               <span class="contact-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
               </span>
               <h4>WhatsApp</h4>
-              <p>+212 6 11 22 33 44</p>
+              <p id="contactWhatsapp">+212 6 11 22 33 44</p>
             </div>
             <div class="contact-card">
               <span class="contact-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
               </span>
               <h4>Instagram</h4>
-              <p>@amrani_parapharmacie</p>
+              <p id="contactInstagram">@amrani_parapharmacie</p>
             </div>
             <div class="contact-card">
               <span class="contact-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
               </span>
               <h4>Email</h4>
-              <p>contact@amrani.ma</p>
+              <p id="contactEmail">contact@amrani.ma</p>
             </div>
             <div class="contact-card">
               <span class="contact-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
               </span>
               <h4>Adresse</h4>
-              <p>123, Avenue Hassan II, Casablanca</p>
+              <p id="contactAddress">123, Avenue Hassan II, Casablanca</p>
             </div>
             <div class="contact-card">
               <span class="contact-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               </span>
               <h4>Horaires</h4>
-              <p>Lun–Sam : 9h – 20h</p>
+              <p id="contactHours">Lun–Sam : 9h – 20h</p>
             </div>
           </div>
           <div class="contact-form">
+            <h3>Envoyez-nous un message</h3>
+            <!-- Step 6: success/error notification for the public contact
+                 form. Reuses the EXISTING .settings-notification /
+                 .settings-notification-success / .settings-notification-error
+                 classes already defined in css/style.css (used by
+                 js/settings.js) — no new CSS added. Hidden by default. -->
+            <div id="contactFormNotification" class="settings-notification" style="display:none;"></div>
             <form id="contactForm" novalidate>
-              <h3>Envoyez-nous un message</h3>
               <div class="form-group">
                 <input type="text" id="name" placeholder="Nom complet" required>
                 <span class="error-msg" id="nameError"></span>
@@ -160,7 +169,10 @@
                 <textarea id="message" rows="4" placeholder="Votre message..." required></textarea>
                 <span class="error-msg" id="messageError"></span>
               </div>
-              <button type="submit" class="btn btn-primary">Envoyer</button>
+              <!-- Step 6: id added so js/index.js can disable it and show a
+                   submitting state during the Supabase insert. No visual
+                   change — same classes, same label. -->
+              <button type="submit" class="btn btn-primary" id="contactSubmitBtn">Envoyer</button>
             </form>
           </div>
         </div>
@@ -188,13 +200,13 @@
       <div class="footer-social">
         <h4>Suivez-nous</h4>
         <div class="social-icons">
-          <a href="#" aria-label="Instagram">
+          <a href="#" id="footerInstagramLink" aria-label="Instagram">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
           </a>
-          <a href="#" aria-label="WhatsApp">
+          <a href="#" id="footerWhatsappLink" aria-label="WhatsApp">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           </a>
-          <a href="#" aria-label="Email">
+          <a href="#" id="footerEmailLink" aria-label="Email">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
           </a>
         </div>
@@ -210,6 +222,8 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
   </button>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
   <script src="js/index.js"></script>
 </body>
 </html>
