@@ -39,15 +39,15 @@
 //   its own defaulted columns.
 // ====================================================
 
-// ---------- SAMPLE DATA (Produits en vedette — out of scope for this
-// step; the Public Products page is implemented in a later step) ----------
-const sampleProducts = [
-  { id: 1, name: 'Crème Hydratante', brand: 'La Roche-Posay', price: '24,90 €', available: true, icon: 'cream' },
-  { id: 2, name: 'Vitamine C + Zinc', brand: 'Nutri&Co', price: '18,50 €', available: true, icon: 'vitamin' },
-  { id: 3, name: 'Shampoing Douceur', brand: 'Klorane', price: '12,30 €', available: false, icon: 'shampoo' },
-  { id: 4, name: 'Baume Lèvres', brand: 'Nuxe', price: '8,90 €', available: true, icon: 'lip' },
-  { id: 5, name: 'Huile de Douche', brand: 'Dermophil', price: '14,20 €', available: true, icon: 'oil' },
-];
+// ---------- SAMPLE DATA (Produits en vedette) ----------
+// PRODUCTION DATA CLEANUP: this array previously held hardcoded demo
+// products and is now intentionally empty. loadProducts() below is
+// left completely unchanged — with an empty array it simply renders
+// an empty #productGrid instead of fake demo cards. Wiring "Produits
+// en vedette" to real Supabase data (e.g. is_featured = true) was
+// never implemented and remains a separate future step, not part of
+// this data-only cleanup.
+const sampleProducts = [];
 
 // ---------- SVG ICON MAP ----------
 const iconMap = {

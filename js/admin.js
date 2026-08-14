@@ -2,42 +2,26 @@
 // js/admin.js — Admin Panel for Amrani Parapharmacie
 // ====================================================
 
-// ---------- SAMPLE DATA (remplacé par Supabase plus tard) ----------
-// Replace with Supabase queries later
-let products = [
-    { id: 1, nameFR: 'Crème Hydratante Visage', nameAR: 'كريم مرطب للوجه', descFR: 'Crème hydratante apaisante pour peau sensible', descAR: 'كريم مرطب مهدئ للبشرة الحساسة', image: '🧴', brand: 'La Roche-Posay', price: 125, categories: ['Skincare'], available: true, featured: true },
-    { id: 2, nameFR: 'Vitamine C + Zinc', nameAR: 'فيتامين سي + زنك', descFR: 'Complément alimentaire pour renforcer l\'immunité', descAR: 'مكمل غذائي لتقوية المناعة', image: '💊', brand: 'Nutri&Co', price: 185, categories: ['Vitamins'], available: true, featured: false },
-    { id: 3, nameFR: 'Shampoing Douceur', nameAR: 'شامبو لطيف', descFR: 'Shampoing doux à la camomille', descAR: 'شامبو لطيف بالبابونج', image: '🧴', brand: 'Klorane', price: 98, categories: ['Hair Care'], available: false, featured: false },
-    { id: 4, nameFR: 'Baume Lèvres Réparateur', nameAR: 'بلسم مرمم للشفاه', descFR: 'Baume réparateur à l\'huile de tournesol', descAR: 'بلسم مرمم بزيت دوار الشمس', image: '💋', brand: 'Nuxe', price: 65, categories: ['Skincare'], available: true, featured: false },
-    { id: 5, nameFR: 'Huile de Douche Surgras', nameAR: 'زيت استحمام فائق الدهون', descFR: 'Huile de douche nourrissante pour peaux sèches', descAR: 'زيت استحمام مغذي للبشرة الجافة', image: '🧴', brand: 'Dermophil', price: 112, categories: ['Hygiene'], available: true, featured: false },
-];
+// ---------- SAMPLE DATA ----------
+// PRODUCTION DATA CLEANUP: these four arrays previously held hardcoded
+// demo rows and are now intentionally empty. They still back the
+// Dashboard's stat cards and "recent" tables (updateStats()) and the
+// pre-population step for the product category <select>
+// (populateCategorySelects(), immediately overwritten with real
+// Supabase categories by ProductsModule — see js/products.js). No
+// function logic was changed: with empty arrays, Dashboard now
+// correctly shows 0 / empty instead of fake demo numbers. Wiring the
+// Dashboard to real live Supabase counts was never implemented and
+// remains a separate future step, not part of this data-only cleanup.
+let products = [];
+let categories = [];
+let promotions = [];
+let messages = [];
 
-let categories = [
-    { id: 1, nameFR: 'Soins du visage', nameAR: 'العناية بالوجه', image: '🧴', count: 2 },
-    { id: 2, nameFR: 'Bébé', nameAR: 'طفل', image: '👶', count: 0 },
-    { id: 3, nameFR: 'Vitamines', nameAR: 'فيتامينات', image: '💊', count: 1 },
-    { id: 4, nameFR: 'Hygiène', nameAR: 'نظافة', image: '🧼', count: 1 },
-    { id: 5, nameFR: 'Cheveux', nameAR: 'شعر', image: '💇', count: 1 },
-    { id: 6, nameFR: 'Corps', nameAR: 'جسم', image: '🧖', count: 0 },
-];
-
-let promotions = [
-    { id: 1, titleFR: 'Offre Rentrée', titleAR: 'عرض العودة للمدارس', descFR: '-20% sur les soins visage', descAR: 'خصم 20% على العناية بالوجه', image: '🎯', start: '2025-09-01', end: '2025-09-30', active: true },
-    { id: 2, titleFR: 'Pack Bébé', titleAR: 'حزمة الطفل', descFR: 'Lait + Crème à prix doux', descAR: 'حليب + كريم بسعر لطيف', image: '👶', start: '2025-10-01', end: '2025-10-31', active: true },
-    { id: 3, titleFR: 'Vitamines en promo', titleAR: 'فيتامينات بأسعار مخفضة', descFR: 'Achetez 2, obtenez 1 offert', descAR: 'اشتر 2 واحصل على 1 مجاناً', image: '💪', start: '2025-11-01', end: '2025-11-30', active: false },
-];
-
-let messages = [
-    { id: 1, name: 'Jean Dupont', email: 'jean@email.com', phone: '0612345678', message: 'Bonjour, je souhaite plus d\'informations sur la crème hydratante.', date: '2025-01-15 14:30', status: 'unread' },
-    { id: 2, name: 'Fatima Zahra', email: 'fatima@email.com', phone: '0623456789', message: 'Est-ce que vous livrez à Casablanca ?', date: '2025-01-14 10:15', status: 'read' },
-    { id: 3, name: 'Mohammed Ali', email: 'mohammed@email.com', phone: '0634567890', message: 'Je cherche un complément vitaminé pour l\'hiver.', date: '2025-01-13 16:45', status: 'unread' },
-    { id: 4, name: 'Sophie Martin', email: 'sophie@email.com', phone: '0645678901', message: 'Merci pour votre rapidité de livraison !', date: '2025-01-12 09:20', status: 'read' },
-];
-
-let nextProductId = 6;
-let nextCategoryId = 7;
-let nextPromoId = 4;
-let nextMessageId = 5;
+let nextProductId = 1;
+let nextCategoryId = 1;
+let nextPromoId = 1;
+let nextMessageId = 1;
 let deleteTarget = null;
 let deleteType = null;
 
@@ -487,6 +471,14 @@ function updateStats() {
         </tr>
     `).join('');
 }
+// NOTE (QA audit): the four counters above and the two "recent" tables
+// still read from the local demo arrays (products/categories/promotions/
+// messages) rather than Supabase. Dashboard/stats were never part of any
+// completed feature step (see the "SAMPLE DATA — remplacée par Supabase
+// plus tard" comment at the top of this file), so this is an existing,
+// documented limitation rather than a regression, and is intentionally
+// left unchanged by this QA pass — fixing it would be new feature work,
+// not a bug fix.
 
 // ---------- POPULATE CATEGORY SELECTS ----------
 function populateCategorySelects() {
@@ -507,8 +499,18 @@ function populateCategorySelects() {
 
 // ---------- SETUP EVENTS ----------
 function setupEvents() {
-    // Category form
-    document.getElementById('categoryForm').addEventListener('submit', saveCategory);
+    // Category form is now owned by CategoriesModule (js/categories.js),
+    // which binds its own real Supabase submit handler to #categoryForm.
+    // The old demo saveCategory() listener that used to be registered
+    // here was removed: left in place, it fired alongside the real
+    // handler on every submit (a form's submit event doesn't stop other
+    // listeners just because one of them calls preventDefault()), AND it
+    // referenced a #catImage element that no longer exists in the
+    // current markup (replaced by #catImageFile/#catImagePreview/
+    // #catImageUrl), throwing an uncaught TypeError on every category
+    // save. Same class of dual-execution bug already fixed below for
+    // Promotions/Products/Messages — this was the one instance that had
+    // been missed (found and fixed in the Final QA audit).
 
     // Promotion form is now owned by PromotionsModule (js/promotions.js),
     // which binds its own real Supabase submit handler to #promoForm.
@@ -530,13 +532,17 @@ function setupEvents() {
     // fake demo `messages` array on every keystroke/change — the exact
     // dual-execution bug already found and fixed for Promotions. Real
     // search/filter for Messages will be wired up in a later step.
-    
-    // Settings form
-    document.getElementById('settingsForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('✅ Paramètres enregistrés avec succès !');
-    });
-    
+
+    // Settings form is now owned by js/settings.js, which binds its own
+    // real Supabase submit handler to #settingsForm. The old demo
+    // listener that used to be registered here was removed: left in
+    // place, it fired alongside the real handler on every submit,
+    // popping up a spurious alert() on top of the real
+    // #settingsNotification success banner — the same dual-execution bug
+    // already fixed for Promotions/Products/Messages, now also fixed
+    // here and for Categories above (found and fixed in the Final QA
+    // audit).
+
     // Logout
     document.getElementById('logoutBtn').addEventListener('click', function() {
         if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
